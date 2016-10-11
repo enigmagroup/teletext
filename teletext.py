@@ -2,9 +2,12 @@
 
 from gevent import spawn, sleep, monkey; monkey.patch_all()
 from bottle import run, debug
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 from routes import *
 from workers import *
+
 
 
 # spawn the write worker

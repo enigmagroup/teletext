@@ -11,28 +11,8 @@ from time import timezone, strptime, strftime, mktime
 from json import loads as json_loads, dumps as json_dumps
 from re import compile as re_compile
 
+from queue import *
 from data import *
-
-################################################################################
-# queue class
-################################################################################
-
-class Queue():
-    def __init__(self):
-        self.bs = beanstalkc.Connection()
-
-    def add(self, queue, value):
-        self.bs.use(queue)
-        self.bs.put(value)
-
-    def get_job(self, queue):
-        self.bs.watch(queue)
-        return self.bs.reserve()
-
-    def close(self):
-        self.bs.close()
-
-
 
 ################################################################################
 # workers
@@ -134,7 +114,7 @@ def write_worker():
     queue = Queue()
     while True:
         job = queue.get_job('write')
-        print 'got job', job
+        log.debug('got write-job: %s', job.body)
 
         try:
             job_body = json_loads(job.body)
@@ -155,7 +135,9 @@ def write_worker():
                 except:
                     # regular telegram
                     if not data.telegram_exists(author, created_at):
+                        log.debug("dne")
                         data.add_telegram(text, author, created_at, imported)
+                        log.debug("after add")
 
             elif job_body['job_desc'] == 'retransmit_telegram':
                 ipv6 = job_body['telegram']['ipv6']
@@ -213,8 +195,8 @@ def write_worker():
                     data.set_user_attr(user_id, 'name', profile['name'])    # just to refresh updated_at
                     data._fetch_remote_profile(ipv6)
 
-        except:
-            print 'error processing job'
+        except Exception as strerr:
+            print 'error processing job -', strerr
 
         job.delete()
         #print 'job finished.'
@@ -225,7 +207,7 @@ def notification_worker():
     queue = Queue()
     while True:
         job = queue.get_job('notification')
-        #print 'got job'
+        log.debug('got notification-job: %s', job.body)
 
         try:
             job_body = json_loads(job.body)

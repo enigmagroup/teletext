@@ -23,7 +23,8 @@ def internal(fn):
         remote_ip = get_real_ip()
 
         if ':' in remote_ip:
-            log.debug("utils.py:26: re-enable permission check")
+            pass
+            #log.debug("utils.py:26: re-enable permission check")
             #return '404'
         return fn(**kwargs)
 
