@@ -10,19 +10,20 @@ from datetime import datetime, timedelta
 from time import timezone, strptime, strftime, mktime
 from json import loads as json_loads, dumps as json_dumps
 from re import compile as re_compile
+import logging as log
 
 ################################################################################
 # utils
 ################################################################################
 
-# internal decorator
-
+""" if you are on an ipv6, disallow access
+(assume you are external, tun0)"""
 def internal(fn):
     def check_ip(**kwargs):
         remote_ip = get_real_ip()
 
         if ':' in remote_ip:
-            print "todo: remove that!"
+            log.debug("utils.py:26: re-enable permission check")
             #return '404'
         return fn(**kwargs)
 

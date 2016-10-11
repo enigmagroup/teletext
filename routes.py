@@ -22,7 +22,6 @@ from workers import *
 @route('/')
 @internal
 def root():
-    print "hoi"
     username = data.get_meta('username', '')
     if username == '':
         redirect('/settings')
