@@ -3,6 +3,8 @@
 from gevent import spawn, sleep, monkey; monkey.patch_all()
 from bottle import run, debug
 
+from routes import *
+
 
 ## spawn the write worker
 #spawn(write_worker)

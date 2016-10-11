@@ -11,6 +11,8 @@ from time import timezone, strptime, strftime, mktime
 from json import loads as json_loads, dumps as json_dumps
 from re import compile as re_compile
 
+from data import *
+
 ################################################################################
 # queue class
 ################################################################################
