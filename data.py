@@ -469,6 +469,7 @@ class Data():
         return len(self.c.fetchall()) > 0
 
     def add_telegram(self, text, author, created_at, imported = '0', retransmission_from = None, retransmission_original_time = None):
+        text = text.replace("\r\n", "\n")
         text = text[:256]
         user_id = self._get_or_create_userid(author)
         self.db.execute("""INSERT INTO telegrams (text,user_id,created_at,imported,retransmission_from,retransmission_original_time)
