@@ -134,7 +134,7 @@ def write_worker():
     queue = Queue()
     while True:
         job = queue.get_job('write')
-        #print 'got job'
+        print 'got job', job
 
         try:
             job_body = json_loads(job.body)

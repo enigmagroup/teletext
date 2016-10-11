@@ -4,15 +4,16 @@ from gevent import spawn, sleep, monkey; monkey.patch_all()
 from bottle import run, debug
 
 from routes import *
+from workers import *
 
 
-## spawn the write worker
-#spawn(write_worker)
-#
-## spawn 10 notification workers with some delay in between to prevent segfaults
-#for i in range(10):
-#    spawn(notification_worker)
-#    sleep(0.2)
+# spawn the write worker
+spawn(write_worker)
+
+# spawn 10 notification workers with some delay in between to prevent segfaults
+for i in range(10):
+    spawn(notification_worker)
+    sleep(0.2)
 
 
 

@@ -62,7 +62,9 @@ def new_telegram():
         }
 
         json = json_dumps(json)
+        print json
         queue.add('write', json)
+        print "added to queue"
 
         json = {
             'job_desc': 'notify_all_subscribers',
