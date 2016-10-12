@@ -326,6 +326,7 @@ class Data():
             ipv6 = res[2]
             created_at = res[3]
             created_at_formatted = format_datestring(res[3])
+            created_at_pubdate = format_datestring(res[3], True)
 
             if len(res) > 4 and res[4] != None:
                 retransmission_from = res[4]
@@ -352,6 +353,7 @@ class Data():
                 'ipv6': ipv6,
                 'created_at': created_at,
                 'created_at_formatted': created_at_formatted,
+                'created_at_pubdate': created_at_pubdate,
                 'retransmission_from': retransmission_from,
                 'retransmission_from_author': retransmission_from_author,
                 'retransmission_original_time': retransmission_original_time,

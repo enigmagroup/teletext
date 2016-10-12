@@ -44,8 +44,10 @@ def pad_ipv6(ipv6):
     splitter = ipv6.strip().split(':')
     return ':'.join([ str(block).zfill(4) for block in splitter ])
 
-def format_datestring(date):
+def format_datestring(date, pubdate_format=False):
     dt = datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f')
+    if pubdate_format:
+        return dt.strftime('%a, %d %b %Y %H:%M:%S %z')
     epoch = mktime(dt.timetuple())
     offset = datetime.fromtimestamp(epoch) - datetime.utcfromtimestamp(epoch)
     dt = dt + offset
