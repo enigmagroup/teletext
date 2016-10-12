@@ -40,7 +40,7 @@ def root():
 
 @route('/rss')
 @internal
-def root():
+def rss():
     username = data.get_meta('username', '')
     if username == '':
         redirect('/settings')
