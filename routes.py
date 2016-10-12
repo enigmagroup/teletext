@@ -38,6 +38,22 @@ def root():
 
 
 
+@route('/rss')
+@internal
+def root():
+    username = data.get_meta('username', '')
+    if username == '':
+        redirect('/settings')
+
+    check_new_transmissions()
+    telegrams = data.get_telegrams()
+
+    return template('rss',
+        telegrams = telegrams,
+    )
+
+
+
 @route('/new_telegram', method = 'POST')
 @internal
 def new_telegram():
