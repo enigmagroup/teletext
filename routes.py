@@ -127,6 +127,24 @@ def profile_page(ipv6):
 
 
 
+@route('/<ipv6:re:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}>/rss')
+@internal
+def profile_page_rss(ipv6):
+    username = data.get_meta('username', '')
+    if username == '':
+        redirect('/settings')
+
+    my_ipv6 = data.get_meta('ipv6')
+    profile = data.get_profile(ipv6)
+    telegrams = data.get_telegrams(author = ipv6, fetch_external = True)
+    subscribed = data.is_in_subscriptions(ipv6)
+
+    return template('rss',
+        telegrams = telegrams,
+    )
+
+
+
 @route('/<ipv6:re:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}>/<subscription_type:re:(subscribers|subscriptions)>')
 @internal
 def me(ipv6, subscription_type):
