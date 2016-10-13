@@ -17,9 +17,9 @@ def internal(fn):
         remote_ip = get_real_ip()
 
         if ':' in remote_ip:
-            pass
-            #log.debug("utils.py:26: re-enable permission check")
             #return '404'
+            # TODO: define your ipv6 and check that
+            pass
         return fn(**kwargs)
 
     return check_ip
