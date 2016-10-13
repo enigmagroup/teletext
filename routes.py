@@ -225,31 +225,30 @@ def addressbook_requests():
         profile = data.get_profile(ipv6)
         username = profile['name'].encode('utf-8')
 
-        #TODO: remove print statements
-        print 'making request to 127...'
+        log.debug('making request to Enigmabox address book...')
         response = urlopen(url='http://127.0.0.1:8000/api/v1/add_contact',
             data = 'ipv6=' + ipv6 + '&hostname=' + quote(username),
             timeout = 5,
         )
         content = response.read()
         addrbook_url = json_loads(content)['addrbook_url']
-        print 'making request to ' + ipv6
+        log.debug('making request to %s', ipv6)
         urlopen(url='http://[' + ipv6 + ']:3838/api/v1/contact_request',
             data = 'what=confirm',
             timeout = 5,
         )
         data.addr_remove_request('from', ipv6)
-        print 'done.'
+        log.debug('done.')
 
     if request.POST.get('decline_request'):
         ipv6 = request.POST.get('decline_request')
-        print 'making request to ' + ipv6
+        log.debug('making request to %s', ipv6)
         urlopen(url='http://[' + ipv6 + ']:3838/api/v1/contact_request',
             data = 'what=decline',
             timeout = 5,
         )
         data.addr_remove_request('from', ipv6)
-        print 'done.'
+        log.debug('done.')
 
     requests_list = data.addr_get_requests('from')
 
@@ -272,21 +271,20 @@ def addressbook_new_request(ipv6):
     comments = request.POST.get('comments', '')[:256]
 
     if request.POST.get('send_request') and ipv6 != '':
-        #TODO: remove printies
-        print 'making request to 127...'
+        log.debug('making request to Enigmabox address book...')
         response = urlopen(url='http://127.0.0.1:8000/api/v1/add_contact',
             data = 'ipv6=' + ipv6 + '&hostname=' + quote(username),
             timeout = 5,
         )
         content = response.read()
         addrbook_url = json_loads(content)['addrbook_url']
-        print 'making request to ' + ipv6
+        log.debug('making request to %s', ipv6)
         urlopen(url='http://[' + ipv6 + ']:3838/api/v1/contact_request',
             data = 'what=new&comments=' + quote(comments),
             timeout = 5,
         )
         data.addr_add_request('to', ipv6, comments)
-        print 'done.'
+        log.debug('done.')
         message = 'Request sent.'
 
     return template('addressbook_new_request',
@@ -329,7 +327,7 @@ def settings():
         for u in user_list:
             spawn(data.get_profile, u['ipv6'])
     except Exception:
-        pass
+        log.info('No Enigmabox address book found, ignoring...')
 
     if request.POST.get('save'):
         username = request.POST.get('username', '')[:30].decode('utf-8')
