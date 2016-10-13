@@ -48,6 +48,8 @@ def rss():
 
     return template('rss',
         telegrams = telegrams,
+        rss_url = '/rss',
+        author = '',
     )
 
 
@@ -136,10 +138,11 @@ def profile_page_rss(ipv6):
     my_ipv6 = data.get_meta('ipv6')
     profile = data.get_profile(ipv6)
     telegrams = data.get_telegrams(author = ipv6, fetch_external = True)
-    subscribed = data.is_in_subscriptions(ipv6)
 
     return template('rss',
         telegrams = telegrams,
+        rss_url = '/' + ipv6 + '/rss',
+        author = ' - ' + profile['name'],
     )
 
 
