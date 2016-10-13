@@ -1,4 +1,0 @@
-
-t.timeline = ->
-    true
-
