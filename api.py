@@ -128,8 +128,9 @@ def api_new_telegram():
 
                 result = 'success'
 
-        except Exception:
-            pass
+        except Exception as strerr:
+            log.error('Error adding telegram in api.py: %s', strerr)
+            result = 'error'
 
     return {"result": result}
 
