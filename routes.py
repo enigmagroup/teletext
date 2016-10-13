@@ -29,6 +29,7 @@ def root():
     return template('home',
         telegrams = telegrams,
         xhr_url = '/xhr/timeline',
+        rss_url = '/rss',
         my_ipv6 = data.get_meta('ipv6'),
         pending_requests = data.pending_requests_exist(),
     )
@@ -111,6 +112,7 @@ def profile_page(ipv6):
         template = 'timeline',
         telegrams = telegrams,
         xhr_url = '/xhr/timeline?ipv6=' + ipv6,
+        rss_url = '/' + ipv6 + '/rss',
         ipv6 = ipv6,
         username = profile['name'],
         bio = profile['bio'],
