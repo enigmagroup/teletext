@@ -3,7 +3,10 @@
 from gevent import spawn, sleep, monkey; monkey.patch_all()
 from bottle import run, debug
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(
+    format = "%(levelname) -10s %(asctime)s %(module)s:%(lineno)s %(funcName)s %(message)s",
+    level=logging.DEBUG
+)
 
 from routes import *
 from workers import *

@@ -26,7 +26,7 @@ class Data():
             dbversion = self.c.fetchone()[0]
             self.migrate_db(dbversion)
         except Exception:
-            print 'initializing database'
+            log.info('initializing database')
             self.migrate_db(0)
 
     def migrate_db(self, version):
@@ -179,7 +179,7 @@ class Data():
             pass
 
         if db_time == None:
-            #print 'no db time found, new profile, waiting for fetch...'
+            log.info('no db time found, new profile, waiting for fetch...')
             profile = self._fetch_remote_profile(ipv6)
 
         elif db_time < one_hour_ago:
