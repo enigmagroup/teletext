@@ -2,5 +2,4 @@
 t = t || {}
 
 $(document).ready ->
-    t.timeline.init()
-
+    t.char_counter()

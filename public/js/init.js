@@ -3,5 +3,5 @@ var t;
 t = t || {};
 
 $(document).ready(function() {
-  return t.timeline.init();
+  return t.char_counter();
 });
