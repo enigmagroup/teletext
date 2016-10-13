@@ -192,7 +192,8 @@ def external_subscribe():
         ipv6 = pad_ipv6(get_real_ip())
         data.add_subscriber(ipv6)
         result = 'success'
-    except Exception:
+    except Exception as strerr:
+        log.error(strerr)
         result = 'failed'
 
     return {"result": result}
@@ -205,7 +206,8 @@ def external_unsubscribe():
         ipv6 = pad_ipv6(get_real_ip())
         data.remove_subscriber(ipv6)
         result = 'success'
-    except Exception:
+    except Exception as strerr:
+        log.error(strerr)
         result = 'failed'
 
     return {"result": result}
@@ -220,23 +222,25 @@ def contact_request():
         comments = request.POST.get('comments', '')
 
         if what == 'new':
-            print 'receiving new request'
+            log.debug('receiving new request from %s', ipv6)
             data.get_profile(ipv6)
             data.addr_add_request('from', ipv6, comments)
-            print 'done.'
+            log.debug('done')
         elif what == 'confirm':
-            print 'receiving confirmation from ' + ipv6
+            log.debug('receiving confirmation from %s', + ipv6)
             data.addr_remove_request('to', ipv6)
-            print 'done.'
+            log.debug('done')
         elif what == 'decline':
-            print 'receiving declination from ' + ipv6
+            log.debug('receiving declination from %s', + ipv6)
             data.addr_remove_request('to', ipv6)
+            log.debug('done')
         else:
             raise
 
         result = 'success'
 
-    except Exception:
+    except Exception as strerr:
+        log.error(strerr)
         result = 'failed'
 
     return {"result": result}

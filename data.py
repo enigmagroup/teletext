@@ -32,7 +32,7 @@ class Data():
     def migrate_db(self, version):
         version = int(version)
         if version < 1:
-            print 'migrating to version 1'
+            log.info('migrating to version 1')
             self.db.execute("""CREATE TABLE meta (
                 id INTEGER PRIMARY KEY,
                 key char(50) NOT NULL,
@@ -70,7 +70,7 @@ class Data():
             VALUES ('dbversion','1')""")
             self.db.commit()
         if version < 2:
-            print 'migrating to version 2'
+            log.info('migrating to version 2')
             self.db.execute("""CREATE TABLE requests (
                 id INTEGER PRIMARY KEY,
                 direction char(10) NOT NULL,
@@ -83,7 +83,7 @@ class Data():
             WHERE key = 'dbversion'""")
             self.db.commit()
         #if version < 3:
-        #    print 'migrating to version 3'
+        #    log.info('migrating to version 3')
         #
         #    self.db.execute("""UPDATE meta
         #    SET value = '2'
@@ -179,14 +179,14 @@ class Data():
             pass
 
         if db_time == None:
-            log.info('no db time found, new profile, waiting for fetch...')
+            log.debug('no db time found, new profile, waiting for fetch...')
             profile = self._fetch_remote_profile(ipv6)
 
         elif db_time < one_hour_ago:
             if my_ipv6 == ipv6:
                 self.refresh_counters()
             else:
-                #print 'profile outdated, fetching...'
+                log.debug('profile %s is outdated, fetching...', ipv6)
                 queue = Queue()
 
                 json = {
@@ -300,6 +300,7 @@ class Data():
 
         if len(result) == 0 and fetch_external and author != my_ipv6:
             try:
+                log.debug('trying to get profile %s...', author)
                 profile = self.get_profile(author)
                 response = urlopen(url='http://[' + author + ']:3838/api/v1/get_telegrams.json?step=' + str(step), timeout = 5)
                 content = response.read()
@@ -312,6 +313,7 @@ class Data():
                     except Exception:
                         result.append((t['text'], profile['name'], author, t['created_at']))
             except Exception:
+                log.debug('%s currently unreachable.', author)
                 pass
 
         telegrams = []
@@ -499,8 +501,8 @@ class Data():
             queue.add('notification', json)
             queue.close()
 
-        except Exception:
-            print 'retransmission failed'
+        except Exception as strerr:
+            log.warning('retransmission failed: %s', strerr)
 
     def delete_telegram(self, ipv6, created_at):
         user_id = self._get_or_create_userid(ipv6)
