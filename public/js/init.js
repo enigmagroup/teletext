@@ -3,5 +3,7 @@ var t;
 t = t || {};
 
 $(document).ready(function() {
-  return t.char_counter();
+  t.char_counter();
+  t.xhr_load();
+  return true;
 });
