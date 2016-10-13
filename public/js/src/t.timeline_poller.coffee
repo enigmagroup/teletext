@@ -7,7 +7,6 @@ t.timeline_xhr = ->
     t.timeline_newest = $('li:first .created_at', $timeline).data('created_at')
 
     if xhr_url
-
         if xhr_url.indexOf('?') > -1
             xhr_url += '&since=' + t.timeline_newest
         else
