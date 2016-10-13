@@ -24,7 +24,7 @@ def check_new_transmissions():
         pass
 
     if db_time == None or db_time < one_hour_ago:
-        #print 'checking for new transmissions'
+        log.debug('checking for new transmissions')
         subscriptions = data.get_userlist('subscriptions')
         for s in subscriptions:
             spawn(get_transmissions, s['ipv6'])
@@ -61,7 +61,7 @@ def get_transmissions(ipv6):
 
             try:
                 # retransmission
-                #print 'importing ' + text.encode('utf-8')
+                log.debug('importing retransmission: %s', text.encode('utf-8'))
 
                 retransmission_from = telegram['retransmission_from']
                 retransmission_original_time = telegram['retransmission_original_time']
@@ -86,7 +86,7 @@ def get_transmissions(ipv6):
 
             except Exception:
                 # regular telegram
-                #print 'importing ' + text.encode('utf-8')
+                log.debug('importing regular telegram: %s', text.encode('utf-8'))
 
                 # import the telegram
                 json = {
@@ -120,7 +120,6 @@ def write_worker():
                 author = job_body['telegram']['author']
                 created_at = job_body['telegram']['created_at']
                 imported = job_body['telegram']['imported']
-                #print job_body
 
                 try:
                     # retransmission
@@ -192,10 +191,10 @@ def write_worker():
                     data._fetch_remote_profile(ipv6)
 
         except Exception as strerr:
-            print 'error processing job -', strerr
+            log.error('error processing job: %s', strerr)
 
         job.delete()
-        #print 'job finished.'
+        log.debug('job finished.')
 
 
 
@@ -296,7 +295,6 @@ def notification_worker():
 
                     text = job_body['telegram']['text']
                     created_at = job_body['telegram']['created_at']
-                    #print job_body
 
                     # push notification
                     subscribers = data.get_all_subscribers()
@@ -321,9 +319,8 @@ def notification_worker():
 
                         i = i + 1
 
-        except Exception:
-            pass
-            #print 'error processing job'
+        except Exception as strerr:
+            log.error('error processing job: %s', strerr)
 
         job.delete()
-        #print 'job finished.'
+        log.debug('job finished.')
