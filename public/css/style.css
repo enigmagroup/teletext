@@ -37,7 +37,7 @@ ul.timeline, ul.user_list {
     float: left;
 }
 
-.timeline img {
+.timeline .profile-img img {
     width: 48px;
 }
 
@@ -80,6 +80,16 @@ ul.timeline, ul.user_list {
     right: 10px;
     bottom: 10px;
     cursor: pointer;
+}
+
+.timeline .rss {
+    position: relative;
+    padding-bottom: 1em;
+}
+
+.timeline .rss img {
+    position: absolute;
+    right: 0;
 }
 
 
