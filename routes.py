@@ -200,7 +200,7 @@ def addressbook():
         response = urlopen(url='http://127.0.0.1:8000/api/v1/get_contacts', timeout = 5)
         content = response.read()
         user_list = json_loads(content)['value']
-    except:
+    except Exception:
         user_list = {}
 
     for i, user in enumerate(user_list):
@@ -316,7 +316,7 @@ def settings():
             content = response.read()
             ipv6 = json_loads(content)['value'].strip()
 
-        except:
+        except Exception:
             ipv6 = '0000:0000:0000:0000:0000:0000:0000:0000' #TODO
 
     user_id = data._get_or_create_userid(ipv6)
@@ -331,7 +331,7 @@ def settings():
         user_list = json_loads(content)['value']
         for u in user_list:
             spawn(data.get_profile, u['ipv6'])
-    except:
+    except Exception:
         pass
 
     if request.POST.get('save'):
@@ -432,7 +432,7 @@ def xhr_subscribe():
             )
             content = response.read()
             result = json_loads(content)['result']
-        except:
+        except Exception:
             result = 'failed'
 
         if result == 'success':
@@ -448,7 +448,7 @@ def xhr_subscribe():
                 data = 'ipv6=' + ipv6,
                 timeout = 5,
             )
-        except:
+        except Exception:
             pass
 
         data.remove_subscription(ipv6)
@@ -519,7 +519,7 @@ def xhr_check_status():
         )
         content = response.read()
         result = json_loads(content)['result']
-    except:
+    except Exception:
         result = 'failed'
 
     return {"result": result}

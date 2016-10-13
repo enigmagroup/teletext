@@ -28,7 +28,7 @@ class Data():
             WHERE key = 'dbversion'""")
             dbversion = self.c.fetchone()[0]
             self.migrate_db(dbversion)
-        except:
+        except Exception:
             print 'initializing database'
             self.migrate_db(0)
 
@@ -101,7 +101,7 @@ class Data():
 
             return self.c.fetchone()[0]
 
-        except:
+        except Exception:
             return default
 
     def set_meta(self, option_key, option_value):
@@ -111,7 +111,7 @@ class Data():
             WHERE key = ?""", (option_value,option_key))
             if self.c.rowcount <= 0:
                 raise
-        except:
+        except Exception:
             self.db.execute("""INSERT INTO meta (key,value)
             VALUES (?,?)""", (option_key,option_value))
 
@@ -134,7 +134,7 @@ class Data():
 
             return user_id
 
-        except:
+        except Exception:
             self.c.execute("""INSERT INTO users (ipv6)
             VALUES (?)""", (ipv6,))
             user_id = self.c.lastrowid
@@ -178,7 +178,7 @@ class Data():
         try:
             t = strptime(db_time, '%Y-%m-%d %H:%M:%S.%f')
             db_time = datetime(t[0], t[1], t[2], t[3], t[4], t[5])
-        except:
+        except Exception:
             pass
 
         if db_time == None:
@@ -231,7 +231,7 @@ class Data():
             f.write(content)
             f.close()
 
-        except:
+        except Exception:
             profile = self.ghost_profile()
 
         return profile
@@ -312,9 +312,9 @@ class Data():
                 for t in telegrams:
                     try:
                         result.append((t['text'], profile['name'], author, t['created_at'], t['retransmission_from'], t['retransmission_original_time']))
-                    except:
+                    except Exception:
                         result.append((t['text'], profile['name'], author, t['created_at']))
-            except:
+            except Exception:
                 pass
 
         telegrams = []
@@ -334,7 +334,7 @@ class Data():
                 try:
                     rt_profile = self.get_profile(retransmission_from)
                     rt_name = rt_profile['name']
-                except:
+                except Exception:
                     rt_name = '[Offline]'
 
                 retransmission_from_author = rt_name
@@ -386,9 +386,9 @@ class Data():
                 profile = self.get_profile(ipv6)
                 try:
                     result = (telegram['text'], profile['name'], ipv6, telegram['created_at'], telegram['retransmission_from'], telegram['retransmission_original_time'])
-                except:
+                except Exception:
                     result = (telegram['text'], profile['name'], ipv6, telegram['created_at'])
-            except:
+            except Exception:
                 pass
 
         if result != None:
@@ -405,7 +405,7 @@ class Data():
                 try:
                     rt_profile = self.get_profile(retransmission_from)
                     rt_name = rt_profile['name']
-                except:
+                except Exception:
                     rt_name = '[Offline]'
 
                 retransmission_from_author = rt_name
@@ -448,7 +448,7 @@ class Data():
 
         try:
             created_at = result[0]
-        except:
+        except Exception:
             created_at = '1970-01-01 00:00:00.000000'
 
         return created_at
@@ -502,7 +502,7 @@ class Data():
             queue.add('notification', json)
             queue.close()
 
-        except:
+        except Exception:
             print 'retransmission failed'
 
     def delete_telegram(self, ipv6, created_at):
@@ -539,7 +539,7 @@ class Data():
                 result = []
                 for u in user_list:
                     result.append((u['ipv6'], u['name']))
-            except:
+            except Exception:
                 result = []
 
         user_list = []

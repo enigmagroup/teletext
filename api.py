@@ -113,7 +113,7 @@ def api_new_telegram():
 
                 result = 'success'
 
-            except:
+            except Exception:
                 # regular telegram
 
                 json = {
@@ -134,7 +134,7 @@ def api_new_telegram():
 
                 result = 'success'
 
-        except:
+        except Exception:
             pass
 
     return {"result": result}
@@ -180,7 +180,7 @@ def profile_json():
 
     try:
         user_list = user_list[0]
-    except:
+    except Exception:
         user_list = {}
 
     # kick unnecessary fields
@@ -197,7 +197,7 @@ def external_subscribe():
         ipv6 = pad_ipv6(get_real_ip())
         data.add_subscriber(ipv6)
         result = 'success'
-    except:
+    except Exception:
         result = 'failed'
 
     return {"result": result}
@@ -210,7 +210,7 @@ def external_unsubscribe():
         ipv6 = pad_ipv6(get_real_ip())
         data.remove_subscriber(ipv6)
         result = 'success'
-    except:
+    except Exception:
         result = 'failed'
 
     return {"result": result}
@@ -241,7 +241,7 @@ def contact_request():
 
         result = 'success'
 
-    except:
+    except Exception:
         result = 'failed'
 
     return {"result": result}

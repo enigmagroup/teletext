@@ -24,7 +24,7 @@ def check_new_transmissions():
     try:
         t = strptime(db_time, '%Y-%m-%d %H:%M:%S.%f')
         db_time = datetime(t[0], t[1], t[2], t[3], t[4], t[5])
-    except:
+    except Exception:
         pass
 
     if db_time == None or db_time < one_hour_ago:
@@ -56,7 +56,7 @@ def get_transmissions(ipv6):
 
             step = step + 10
 
-        except:
+        except Exception:
             return False
 
         for telegram in telegrams:
@@ -88,7 +88,7 @@ def get_transmissions(ipv6):
                 json = json_dumps(json)
                 queue.add('write', json)
 
-            except:
+            except Exception:
                 # regular telegram
                 #print 'importing ' + text.encode('utf-8')
 
@@ -132,7 +132,7 @@ def write_worker():
                     retransmission_original_time = job_body['telegram']['retransmission_original_time']
                     if not data.telegram_exists(retransmission_from, retransmission_original_time):
                         data.add_telegram(text, author, created_at, imported, retransmission_from, retransmission_original_time)
-                except:
+                except Exception:
                     # regular telegram
                     if not data.telegram_exists(author, created_at):
                         log.debug("dne")
@@ -237,7 +237,7 @@ def notification_worker():
                     content = response.read()
                     result = json_loads(content)['result']
 
-                except:
+                except Exception:
                     # regular telegram
 
                     receiver = job_body['telegram']['receiver']
@@ -295,7 +295,7 @@ def notification_worker():
 
                         i = i + 1
 
-                except:
+                except Exception:
                     # regular telegram
 
                     text = job_body['telegram']['text']
@@ -325,7 +325,7 @@ def notification_worker():
 
                         i = i + 1
 
-        except:
+        except Exception:
             pass
             #print 'error processing job'
 
