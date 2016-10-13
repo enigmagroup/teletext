@@ -21,3 +21,17 @@ t.xhr_load = ->
                     t.run_xhr = true
                 else
                     t.run_xhr = false
+
+t.scroll_action = ->
+    d_height = $(document).height()
+    w_height = $(window).height()
+    scroll_to = $(window).scrollTop()
+    bottom_distance = (d_height - w_height - scroll_to)
+
+    if bottom_distance < 100
+        t.xhr_load()
+
+t.xhr = ->
+    setInterval ->
+        t.scroll_action()
+    , 100

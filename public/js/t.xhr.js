@@ -26,3 +26,20 @@ t.xhr_load = function() {
     }
   }
 };
+
+t.scroll_action = function() {
+  var bottom_distance, d_height, scroll_to, w_height;
+  d_height = $(document).height();
+  w_height = $(window).height();
+  scroll_to = $(window).scrollTop();
+  bottom_distance = d_height - w_height - scroll_to;
+  if (bottom_distance < 100) {
+    return t.xhr_load();
+  }
+};
+
+t.xhr = function() {
+  return setInterval(function() {
+    return t.scroll_action();
+  }, 100);
+};
