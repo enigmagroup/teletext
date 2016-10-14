@@ -3,6 +3,7 @@ t = t || {}
 
 $(document).ready ->
     t.char_counter()
+    t.mentions()
     t.xhr()
     t.timeline_poller()
     t.bind_subscribe_buttons()
