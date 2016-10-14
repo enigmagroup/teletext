@@ -6,9 +6,14 @@ t.mentions = ->
 
     $telegram.on 'focus', ->
         if not t.mentions_userlist
-            t.mentions_userlist = ['ois', 'two', 'three']
-
-        t.mentions_atwho()
+            $.get "/api/v1/get_subscription.json?type=subscriptions", (data) ->
+                console.log data
+                t.mentions_userlist = []
+                for u in data.user_list
+                    t.mentions_userlist.push u.name
+                t.mentions_atwho()
+        else
+            t.mentions_atwho()
 
 t.mentions_atwho = ->
     $telegram = $('#telegram')
