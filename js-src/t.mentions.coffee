@@ -7,7 +7,6 @@ t.mentions = ->
     $telegram.on 'focus', ->
         if not t.mentions_userlist
             $.get "/api/v1/get_subscription.json?type=subscriptions", (data) ->
-                console.log data
                 t.mentions_userlist = []
                 for u in data.user_list
                     t.mentions_userlist.push u.name
@@ -20,6 +19,4 @@ t.mentions_atwho = ->
 
     $telegram.atwho
         at: "@"
-        # data: t.mentions_userlist
-        data: do ->
-            return t.mentions_userlist
+        data: t.mentions_userlist
