@@ -19,3 +19,8 @@ t.mentions_atwho = ->
         at: "@"
         data: t.mentions_userlist
         displayTpl: "<li>${name} <small>${ipv6}</small>"
+        callbacks:
+            beforeInsert: (value, $li) ->
+                # TODO: save value in hidden field;
+                # check_hidden()
+                return value
