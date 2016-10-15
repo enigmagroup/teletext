@@ -84,8 +84,9 @@ class Data():
             self.db.commit()
         if version < 3:
             log.info('migrating to version 3')
-            self.db.execute("""ALTER TABLE telegrams ADD COLUMN mentions TEXT
-            )""")
+            self.db.execute("""ALTER TABLE telegrams
+            ADD COLUMN mentions TEXT
+            """)
 
             self.db.execute("""UPDATE meta
             SET value = '3'
