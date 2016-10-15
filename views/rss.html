@@ -7,7 +7,7 @@
     <description>Teletext feed{{author}}</description>
 %for telegram in telegrams:
     <item>
-      <title>{{!telegram['text']}}</title>
+      <title>{{!telegram['text_unescaped']}}</title>
       <dc:creator>{{telegram['author']}}</dc:creator>
       <description><![CDATA[<p>{{!telegram['text']}}</p>]]></description>
       <pubDate>{{telegram['created_at_pubdate']}}</pubDate>
