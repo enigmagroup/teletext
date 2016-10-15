@@ -17,9 +17,18 @@ t.mentions = ->
                 $telegram.on 'keyup', ->
                     t.mentions_checkhidden()
 
-t.mentions_checkhidden = (value) ->
-    console.info 'ch'
-    if not $('input[name=mentions]').length
-        $('#telegram').after '<input type="text" name="mentions" />'
+t.mentions_checkhidden = ->
+    $telegram = $('#telegram')
+    $mentions = $('input[name=mentions]')
+    mentions = []
 
-    $('input[name=mentions]').val value
+    if not $mentions.length
+        $telegram.after '<input type="text" name="mentions" />'
+
+    for u in t.mentions_userlist
+        if $telegram.val().indexOf('@' + u.name) > -1
+            o = {}
+            o[u.name] = u.ipv6
+            mentions.push o
+
+    $mentions.val JSON.stringify(mentions)
