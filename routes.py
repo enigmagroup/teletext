@@ -58,6 +58,8 @@ def rss():
 @internal
 def new_telegram():
     text = request.POST.get('telegram', '').strip()
+    mentions = request.POST.get('mentions', '').strip()
+    mentions = json_loads(mentions)
 
     if text != '':
         text = text.decode('utf-8')
@@ -70,6 +72,7 @@ def new_telegram():
             'job_desc': 'add_telegram',
             'telegram': {
                 'text': text,
+                'mentions': mentions,
                 'author': ipv6,
                 'created_at': now,
                 'imported': 0,

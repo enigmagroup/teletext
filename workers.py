@@ -117,6 +117,7 @@ def write_worker():
 
             if job_body['job_desc'] == 'add_telegram':
                 text = job_body['telegram']['text']
+                mentions = job_body['telegram']['mentions']
                 author = job_body['telegram']['author']
                 created_at = job_body['telegram']['created_at']
                 imported = job_body['telegram']['imported']
@@ -126,13 +127,11 @@ def write_worker():
                     retransmission_from = job_body['telegram']['retransmission_from']
                     retransmission_original_time = job_body['telegram']['retransmission_original_time']
                     if not data.telegram_exists(retransmission_from, retransmission_original_time):
-                        data.add_telegram(text, author, created_at, imported, retransmission_from, retransmission_original_time)
+                        data.add_telegram(text, author, created_at, mentions, imported, retransmission_from, retransmission_original_time, mentions)
                 except Exception:
                     # regular telegram
                     if not data.telegram_exists(author, created_at):
-                        log.debug("dne")
-                        data.add_telegram(text, author, created_at, imported)
-                        log.debug("after add")
+                        data.add_telegram(text, author, created_at, mentions, imported)
 
             elif job_body['job_desc'] == 'retransmit_telegram':
                 ipv6 = job_body['telegram']['ipv6']
