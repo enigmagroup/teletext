@@ -264,7 +264,7 @@ class Data():
             if not since:
                 since = '1970-01-01 00:00:00.000000'
 
-            self.c.execute("""SELECT text, users.name as username, users.ipv6 as ipv6, created_at, retransmission_from, retransmission_original_time
+            self.c.execute("""SELECT text, mentions, users.name as username, users.ipv6 as ipv6, created_at, retransmission_from, retransmission_original_time
             FROM telegrams
             LEFT JOIN users
             ON telegrams.user_id = users.id
@@ -277,7 +277,7 @@ class Data():
             if not since:
                 since = '1970-01-01 00:00:00.000000'
 
-            self.c.execute("""SELECT text, users.name as username, users.ipv6 as ipv6, created_at, retransmission_from, retransmission_original_time
+            self.c.execute("""SELECT text, mentions, users.name as username, users.ipv6 as ipv6, created_at, retransmission_from, retransmission_original_time
             FROM telegrams
             LEFT JOIN users
             ON telegrams.user_id = users.id
@@ -288,7 +288,7 @@ class Data():
             LIMIT 10 OFFSET ? """, (author,since,step))
 
         elif not author and no_imported:
-            self.c.execute("""SELECT text, users.name as username, users.ipv6 as ipv6, created_at, retransmission_from, retransmission_original_time
+            self.c.execute("""SELECT text, mentions, users.name as username, users.ipv6 as ipv6, created_at, retransmission_from, retransmission_original_time
             FROM telegrams
             LEFT JOIN users
             ON telegrams.user_id = users.id
@@ -297,7 +297,7 @@ class Data():
             LIMIT 10 OFFSET ?""", (step,))
 
         elif author and not no_imported:
-            self.c.execute("""SELECT text, users.name as username, users.ipv6 as ipv6, created_at, retransmission_from, retransmission_original_time
+            self.c.execute("""SELECT text, mentions, users.name as username, users.ipv6 as ipv6, created_at, retransmission_from, retransmission_original_time
             FROM telegrams
             LEFT JOIN users
             ON telegrams.user_id = users.id
@@ -309,6 +309,7 @@ class Data():
 
         if len(result) == 0 and fetch_external and author != my_ipv6:
             try:
+                #TODO: mentions
                 log.debug('trying to get profile %s...', author)
                 profile = self.get_profile(author)
                 response = urlopen(url='http://[' + author + ']:3838/api/v1/get_telegrams.json?step=' + str(step), timeout = 5)
@@ -330,14 +331,20 @@ class Data():
         for res in result:
             text = format_text(res[0])
             text_unescaped = res[0]
-            author = res[1]
-            ipv6 = res[2]
-            created_at = res[3]
-            created_at_formatted = format_datestring(res[3])
-            created_at_pubdate = format_datestring(res[3], True)
+            mentions = res[1]
+            try:
+                mentions = json_loads(mentions)
+            except Exception:
+                mentions = []
+            text = link_mentions(text, mentions)
+            author = res[2]
+            ipv6 = res[3]
+            created_at = res[4]
+            created_at_formatted = format_datestring(res[4])
+            created_at_pubdate = format_datestring(res[4], True)
 
-            if len(res) > 4 and res[4] != None:
-                retransmission_from = res[4]
+            if len(res) > 5 and res[5] != None:
+                retransmission_from = res[5]
 
                 try:
                     rt_profile = self.get_profile(retransmission_from)
@@ -346,8 +353,8 @@ class Data():
                     rt_name = '[Offline]'
 
                 retransmission_from_author = rt_name
-                retransmission_original_time = res[5]
-                retransmission_original_time_formatted = format_datestring(res[5])
+                retransmission_original_time = res[6]
+                retransmission_original_time_formatted = format_datestring(res[6])
             else:
                 retransmission_from = None
                 retransmission_from_author = None
@@ -357,6 +364,7 @@ class Data():
             telegrams.append({
                 'text': text,
                 'text_unescaped': text_unescaped,
+                'mentions': mentions,
                 'author': author,
                 'ipv6': ipv6,
                 'created_at': created_at,
@@ -404,7 +412,10 @@ class Data():
             text = format_text(result[0])
             text_unescaped = result[0]
             mentions = result[1]
-            mentions = json_loads(mentions)
+            try:
+                mentions = json_loads(mentions)
+            except Exception:
+                mentions = []
             text = link_mentions(text, mentions)
             author = result[2]
             ipv6 = result[3]
