@@ -158,7 +158,7 @@ def external_profile_image():
 
 
 @route('/api/v1/get_subscription.json')
-def profile_json():
+def get_subscription():
 
     subscription_type = request.GET.get('type')
     step = request.GET.get('step', 0)

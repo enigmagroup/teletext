@@ -6,7 +6,7 @@ t.mentions = ->
 
     $telegram.on 'focus', ->
         if not t.mentions_userlist
-            $.get "/api/v1/get_subscription.json?type=subscriptions", (data) ->
+            $.get "/xhr/mentions_userlist", (data) ->
                 t.mentions_userlist = data.user_list
 
                 $telegram.atwho

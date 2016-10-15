@@ -459,6 +459,14 @@ def xhr_subscribe():
 
 
 
+@route('/xhr/mentions_userlist')
+@internal
+def get_mentions_userlist():
+    user_list = data.get_all_subscribers()
+    return {"user_list": user_list}
+
+
+
 @route('/xhr/retransmit', method = 'POST')
 @internal
 def xhr_retransmit():

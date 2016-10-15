@@ -569,6 +569,27 @@ class Data():
         return user_list
 
     def get_all_subscribers(self):
+        self.c.execute("""SELECT subscriptions.ipv6, users.name
+        FROM subscriptions
+        LEFT JOIN users
+        ON subscriptions.ipv6 = users.ipv6
+        ORDER BY subscriptions.id DESC""")
+
+        result = self.c.fetchall()
+
+        user_list = []
+        for res in result:
+            ipv6 = res[0]
+            name = res[1]
+
+            user_list.append({
+                'ipv6': ipv6,
+                'name': name,
+            })
+
+        return user_list
+
+    def get_all_subscriptions(self):
         self.c.execute("""SELECT subscribers.ipv6
         FROM subscribers
         ORDER BY id ASC""")
