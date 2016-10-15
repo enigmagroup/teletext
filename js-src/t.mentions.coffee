@@ -23,7 +23,7 @@ t.mentions_checkhidden = ->
     mentions = []
 
     if not $mentions.length
-        $telegram.after '<input type="text" name="mentions" />'
+        $telegram.after '<input type="text" class="input-xxlarge" name="mentions" />'
 
     for u in t.mentions_userlist
         if $telegram.val().indexOf('@' + u.name) > -1
