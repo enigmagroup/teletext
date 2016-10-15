@@ -82,11 +82,19 @@ class Data():
             SET value = '2'
             WHERE key = 'dbversion'""")
             self.db.commit()
-        #if version < 3:
-        #    log.info('migrating to version 3')
-        #
+        if version < 3:
+            log.info('migrating to version 3')
+            self.db.execute("""ALTER TABLE telegrams ADD COLUMN mentions TEXT
+            )""")
+
+            self.db.execute("""UPDATE meta
+            SET value = '3'
+            WHERE key = 'dbversion'""")
+            self.db.commit()
+        #if version < 4:
+        #    log.info('migrating to version 4')
         #    self.db.execute("""UPDATE meta
-        #    SET value = '2'
+        #    SET value = '4'
         #    WHERE key = 'dbversion'""")
         #    self.db.commit()
 
