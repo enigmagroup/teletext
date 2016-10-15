@@ -374,7 +374,7 @@ class Data():
 
         my_ipv6 = self.get_meta('ipv6')
 
-        self.c.execute("""SELECT text, users.name as username, users.ipv6 as ipv6, created_at, retransmission_from, retransmission_original_time
+        self.c.execute("""SELECT text, mentions, users.name as username, users.ipv6 as ipv6, created_at, retransmission_from, retransmission_original_time
         FROM telegrams
         LEFT JOIN users
         ON telegrams.user_id = users.id
@@ -393,6 +393,7 @@ class Data():
 
                 profile = self.get_profile(ipv6)
                 try:
+                    # TODO: mentions
                     result = (telegram['text'], profile['name'], ipv6, telegram['created_at'], telegram['retransmission_from'], telegram['retransmission_original_time'])
                 except Exception:
                     result = (telegram['text'], profile['name'], ipv6, telegram['created_at'])
@@ -402,13 +403,16 @@ class Data():
         if result != None:
             text = format_text(result[0])
             text_unescaped = result[0]
-            author = result[1]
-            ipv6 = result[2]
-            created_at = result[3]
-            created_at_formatted = format_datestring(result[3])
+            mentions = result[1]
+            mentions = json_loads(mentions)
+            text = link_mentions(text, mentions)
+            author = result[2]
+            ipv6 = result[3]
+            created_at = result[4]
+            created_at_formatted = format_datestring(result[4])
 
-            if len(result) > 4 and result[4] != None:
-                retransmission_from = result[4]
+            if len(result) > 4 and result[5] != None:
+                retransmission_from = result[5]
 
                 try:
                     rt_profile = self.get_profile(retransmission_from)
@@ -417,8 +421,8 @@ class Data():
                     rt_name = '[Offline]'
 
                 retransmission_from_author = rt_name
-                retransmission_original_time = result[5]
-                retransmission_original_time_formatted = format_datestring(result[5])
+                retransmission_original_time = result[6]
+                retransmission_original_time_formatted = format_datestring(result[6])
             else:
                 retransmission_from = None
                 retransmission_from_author = None
@@ -428,6 +432,7 @@ class Data():
             telegram = {
                 'text': text,
                 'text_unescaped': text_unescaped,
+                'mentions': mentions,
                 'author': author,
                 'ipv6': ipv6,
                 'created_at': created_at,
