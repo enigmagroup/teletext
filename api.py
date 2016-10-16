@@ -2,8 +2,7 @@
 
 from bottle import route, error, run, static_file, template, request, abort, redirect, debug, default_app, html_escape
 from json import loads as json_loads, dumps as json_dumps
-
-from data import *
+import data
 
 ################################################################################
 # API
@@ -19,8 +18,8 @@ def api_ping():
 def telegrams_json():
     step = request.GET.get('step', 0)
     since = request.GET.get('since', False)
-    ipv6 = data.get_meta('ipv6')
-    telegrams = data.get_telegrams(author = ipv6, no_imported = True, step = step, since = since)
+    ipv6 = data.db.get_meta('ipv6')
+    telegrams = data.db.get_telegrams(author = ipv6, no_imported = True, step = step, since = since)
 
     for key, val in enumerate(telegrams):
         # only keep text, created_at, mentions, and retransmission_from+orgtime if set
@@ -43,9 +42,9 @@ def telegrams_json():
 
 @route('/api/v1/get_single_telegram.json')
 def single_telegram_json():
-    my_ipv6 = data.get_meta('ipv6')
+    my_ipv6 = data.db.get_meta('ipv6')
     created_at = request.GET.get('created_at')
-    telegram = data.get_single_telegram(my_ipv6, created_at)
+    telegram = data.db.get_single_telegram(my_ipv6, created_at)
 
     if telegram:
         # only keep text, created_at, mentions, and retransmission_from+orgtime if set
@@ -83,7 +82,7 @@ def api_new_telegram():
             ipv6 = pad_ipv6(get_real_ip())
             created_at = telegram['created_at']
 
-            if not data.is_in_subscriptions(ipv6):
+            if not data.db.is_in_subscriptions(ipv6):
                 return {"result": "unsubscribed"}
 
             try:
@@ -92,7 +91,7 @@ def api_new_telegram():
                 retransmission_from = telegram['retransmission_from']
                 retransmission_original_time = telegram['retransmission_original_time']
 
-                if data.retransmission_exists(retransmission_from, retransmission_original_time):
+                if data.db.retransmission_exists(retransmission_from, retransmission_original_time):
                     return {"result": "failed"}
 
                 json = {
@@ -150,8 +149,8 @@ def api_new_telegram():
 
 @route('/api/v1/get_profile.json')
 def profile_json():
-    my_ipv6 = data.get_meta('ipv6')
-    profile = data.get_profile(my_ipv6)
+    my_ipv6 = data.db.get_meta('ipv6')
+    profile = data.db.get_profile(my_ipv6)
 
     del(profile['ipv6'])
     del(profile['updated_at'])
@@ -164,7 +163,7 @@ def profile_json():
 
 @route('/avatar.png')
 def external_profile_image():
-    ipv6 = data.get_meta('ipv6')
+    ipv6 = data.db.get_meta('ipv6')
     return static_file('/img/profile/' + ipv6 + '.png', root = './public')
 
 
@@ -176,14 +175,14 @@ def get_subscription():
     step = request.GET.get('step', 0)
 
     if subscription_type == 'subscribers':
-        show_subscribers = data.get_meta('show_subscribers', '0')
+        show_subscribers = data.db.get_meta('show_subscribers', '0')
         if show_subscribers == '1':
-            user_list = data.get_userlist(subscription_type = 'subscribers', step = step),
+            user_list = data.db.get_userlist(subscription_type = 'subscribers', step = step),
 
     elif subscription_type == 'subscriptions':
-        show_subscriptions = data.get_meta('show_subscriptions', '0')
+        show_subscriptions = data.db.get_meta('show_subscriptions', '0')
         if show_subscriptions == '1':
-            user_list = data.get_userlist(subscription_type = 'subscriptions', step = step),
+            user_list = data.db.get_userlist(subscription_type = 'subscriptions', step = step),
 
     try:
         user_list = user_list[0]
@@ -202,7 +201,7 @@ def get_subscription():
 def external_subscribe():
     try:
         ipv6 = pad_ipv6(get_real_ip())
-        data.add_subscriber(ipv6)
+        data.db.add_subscriber(ipv6)
         result = 'success'
     except Exception as strerr:
         log.error(strerr)
@@ -216,7 +215,7 @@ def external_subscribe():
 def external_unsubscribe():
     try:
         ipv6 = pad_ipv6(get_real_ip())
-        data.remove_subscriber(ipv6)
+        data.db.remove_subscriber(ipv6)
         result = 'success'
     except Exception as strerr:
         log.error(strerr)
@@ -235,16 +234,16 @@ def contact_request():
 
         if what == 'new':
             log.debug('receiving new request from %s', ipv6)
-            data.get_profile(ipv6)
-            data.addr_add_request('from', ipv6, comments)
+            data.db.get_profile(ipv6)
+            data.db.addr_add_request('from', ipv6, comments)
             log.debug('done')
         elif what == 'confirm':
             log.debug('receiving confirmation from %s', + ipv6)
-            data.addr_remove_request('to', ipv6)
+            data.db.addr_remove_request('to', ipv6)
             log.debug('done')
         elif what == 'decline':
             log.debug('receiving declination from %s', + ipv6)
-            data.addr_remove_request('to', ipv6)
+            data.db.addr_remove_request('to', ipv6)
             log.debug('done')
         else:
             raise
