@@ -3,12 +3,13 @@
 from gevent import spawn, sleep, monkey; monkey.patch_all()
 from urllib import quote
 from urllib2 import urlopen
-from datetime import datetime, timedelta
-from time import timezone, strptime
+from datetime import datetime
+from time import strptime
 from json import loads as json_loads, dumps as json_dumps
 
 from queue import *
 from data import *
+from utils import one_hour_ago
 
 ################################################################################
 # workers
@@ -16,14 +17,13 @@ from data import *
 
 def check_new_transmissions():
     db_time = data.get_meta('last_transmission_check')
-    one_hour_ago = datetime.utcnow() - timedelta(minutes = 60 - (60 + timezone/60))
     try:
         t = strptime(db_time, '%Y-%m-%d %H:%M:%S.%f')
         db_time = datetime(t[0], t[1], t[2], t[3], t[4], t[5])
     except Exception:
         pass
 
-    if db_time == None or db_time < one_hour_ago:
+    if db_time == None or db_time < one_hour_ago():
         log.debug('checking for new transmissions')
         subscriptions = data.get_userlist('subscriptions')
         for s in subscriptions:
@@ -180,11 +180,10 @@ def write_worker():
                 ipv6 = job_body['ipv6']
                 profile = data.get_profile(ipv6)
                 db_time = profile['updated_at']
-                one_hour_ago = datetime.utcnow() - timedelta(hours = 1 - (1 + timezone/60/60))
                 t = strptime(db_time, '%Y-%m-%d %H:%M:%S.%f')
                 db_time = datetime(t[0], t[1], t[2], t[3], t[4], t[5])
 
-                if db_time < one_hour_ago:
+                if db_time < one_hour_ago():
                     user_id = data._get_or_create_userid(ipv6)
                     data.set_user_attr(user_id, 'name', profile['name'])    # just to refresh updated_at
                     data._fetch_remote_profile(ipv6)

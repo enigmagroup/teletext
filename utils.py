@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 from bottle import request, html_escape
-from datetime import datetime
-from time import mktime
+from datetime import datetime, timedelta
+from time import mktime, timezone
 from re import compile as re_compile
 import logging as log
 
@@ -59,3 +59,6 @@ def link_mentions(text, mentions):
         for name, ipv6 in m.iteritems():
             text = text.replace('@' + name, '<a target="_blank" href="/' + ipv6 + '">@' + name + '</a>')
     return text
+
+def one_hour_ago():
+    return datetime.utcnow() - timedelta(hours = 1 - timezone/60/60)

@@ -180,7 +180,6 @@ class Data():
         profile['updated_at'] = result[6]
 
         db_time = profile['updated_at']
-        one_hour_ago = datetime.utcnow() - timedelta(hours = 1 - (1 + timezone/60/60))
         try:
             t = strptime(db_time, '%Y-%m-%d %H:%M:%S.%f')
             db_time = datetime(t[0], t[1], t[2], t[3], t[4], t[5])
@@ -191,7 +190,7 @@ class Data():
             log.debug('no db time found, new profile, waiting for fetch...')
             profile = self._fetch_remote_profile(ipv6)
 
-        elif db_time < one_hour_ago:
+        elif db_time < one_hour_ago():
             if my_ipv6 == ipv6:
                 self.refresh_counters()
             else:
