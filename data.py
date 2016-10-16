@@ -584,6 +584,10 @@ class Data():
         return user_list
 
     def get_all_subscribers(self):
+
+        user_list = []
+        _ips = []
+
         self.c.execute("""SELECT subscriptions.ipv6, users.name
         FROM subscriptions
         LEFT JOIN users
@@ -592,15 +596,37 @@ class Data():
 
         result = self.c.fetchall()
 
-        user_list = []
         for res in result:
             ipv6 = res[0]
             name = res[1]
 
-            user_list.append({
-                'ipv6': ipv6,
-                'name': name,
-            })
+            if ipv6 not in _ips:
+                _ips.append(ipv6)
+
+                user_list.append({
+                    'ipv6': ipv6,
+                    'name': name,
+                })
+
+        self.c.execute("""SELECT subscribers.ipv6, users.name
+        FROM subscribers
+        LEFT JOIN users
+        ON subscribers.ipv6 = users.ipv6
+        ORDER BY subscribers.id DESC""")
+
+        result = self.c.fetchall()
+
+        for res in result:
+            ipv6 = res[0]
+            name = res[1]
+
+            if ipv6 not in _ips:
+                _ips.append(ipv6)
+
+                user_list.append({
+                    'ipv6': ipv6,
+                    'name': name,
+                })
 
         return user_list
 
