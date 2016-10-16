@@ -215,7 +215,7 @@ class Data():
             response = urlopen(url='http://[' + ipv6 + ']:3838/api/v1/get_profile.json', timeout = 5)
             content = response.read()
             profile = json_loads(content)['profile']
-            profile['ipv6'] = ipv6.strip()
+            profile['ipv6'] = pad_ipv6(ipv6.strip())
 
             queue = Queue()
 
