@@ -6,17 +6,18 @@ from urllib2 import urlopen
 from datetime import datetime
 from time import strptime
 from json import loads as json_loads, dumps as json_dumps
+import logging as log
 
 from queue import *
-from data import *
 from utils import one_hour_ago
+import data
 
 ################################################################################
 # workers
 ################################################################################
 
 def check_new_transmissions():
-    db_time = data.get_meta('last_transmission_check')
+    db_time = data.db.get_meta('last_transmission_check')
     try:
         t = strptime(db_time, '%Y-%m-%d %H:%M:%S.%f')
         db_time = datetime(t[0], t[1], t[2], t[3], t[4], t[5])
@@ -25,19 +26,19 @@ def check_new_transmissions():
 
     if db_time == None or db_time < one_hour_ago():
         log.debug('checking for new transmissions')
-        subscriptions = data.get_userlist('subscriptions')
+        subscriptions = data.db.get_userlist('subscriptions')
         for s in subscriptions:
             spawn(get_transmissions, s['ipv6'])
 
-        data.set_meta('last_transmission_check', datetime.utcnow())
+        data.db.set_meta('last_transmission_check', datetime.utcnow())
 
 
 
 def get_transmissions(ipv6):
     queue = Queue()
-    since = data.get_latest_telegram(ipv6)
+    since = data.db.get_latest_telegram(ipv6)
     step = 0
-    data.get_profile(ipv6)
+    data.db.get_profile(ipv6)
 
     while True:
 
@@ -66,7 +67,7 @@ def get_transmissions(ipv6):
                 retransmission_from = telegram['retransmission_from']
                 retransmission_original_time = telegram['retransmission_original_time']
 
-                if data.retransmission_exists(retransmission_from, retransmission_original_time):
+                if data.db.retransmission_exists(retransmission_from, retransmission_original_time):
                     continue
 
                 json = {
@@ -126,67 +127,67 @@ def write_worker():
                     # retransmission
                     retransmission_from = job_body['telegram']['retransmission_from']
                     retransmission_original_time = job_body['telegram']['retransmission_original_time']
-                    if not data.telegram_exists(retransmission_from, retransmission_original_time):
-                        data.add_telegram(text, author, created_at, mentions, imported, retransmission_from, retransmission_original_time, mentions)
+                    if not data.db.telegram_exists(retransmission_from, retransmission_original_time):
+                        data.db.add_telegram(text, author, created_at, mentions, imported, retransmission_from, retransmission_original_time, mentions)
                 except Exception:
                     # regular telegram
-                    if not data.telegram_exists(author, created_at):
-                        data.add_telegram(text, author, created_at, mentions, imported)
+                    if not data.db.telegram_exists(author, created_at):
+                        data.db.add_telegram(text, author, created_at, mentions, imported)
 
             elif job_body['job_desc'] == 'retransmit_telegram':
                 ipv6 = job_body['telegram']['ipv6']
                 created_at = job_body['telegram']['created_at']
-                data.retransmit_telegram(ipv6, created_at)
+                data.db.retransmit_telegram(ipv6, created_at)
 
             elif job_body['job_desc'] == 'delete_telegram':
                 ipv6 = job_body['telegram']['ipv6']
                 created_at = job_body['telegram']['created_at']
-                data.delete_telegram(ipv6, created_at)
+                data.db.delete_telegram(ipv6, created_at)
 
             elif job_body['job_desc'] == 'save_profile':
                 profile = job_body['profile']
-                user_id = data._get_or_create_userid(profile['ipv6'])
-                data.set_user_attr(user_id, 'name', profile['name'])
-                data.set_user_attr(user_id, 'bio', profile['bio'])
-                data.set_user_attr(user_id, 'transmissions', profile['transmissions'])
-                data.set_user_attr(user_id, 'subscribers', profile['subscribers'])
-                data.set_user_attr(user_id, 'subscriptions', profile['subscriptions'])
+                user_id = data.db._get_or_create_userid(profile['ipv6'])
+                data.db.set_user_attr(user_id, 'name', profile['name'])
+                data.db.set_user_attr(user_id, 'bio', profile['bio'])
+                data.db.set_user_attr(user_id, 'transmissions', profile['transmissions'])
+                data.db.set_user_attr(user_id, 'subscribers', profile['subscribers'])
+                data.db.set_user_attr(user_id, 'subscriptions', profile['subscriptions'])
 
             elif job_body['job_desc'] == 'refresh_counters':
-                my_ipv6 = data.get_meta('ipv6')
-                user_id = data._get_or_create_userid(my_ipv6)
+                my_ipv6 = data.db.get_meta('ipv6')
+                user_id = data.db._get_or_create_userid(my_ipv6)
 
                 # count transmissions
-                data.c.execute("""SELECT Count(id)
+                data.db.c.execute("""SELECT Count(id)
                 FROM telegrams
                 WHERE user_id = ?""", (user_id,))
-                transmissions_count = data.c.fetchone()[0]
+                transmissions_count = data.db.c.fetchone()[0]
 
                 # count subscribers
-                data.c.execute("""SELECT Count(id)
+                data.db.c.execute("""SELECT Count(id)
                 FROM subscribers""")
-                subscribers_count = data.c.fetchone()[0]
+                subscribers_count = data.db.c.fetchone()[0]
 
                 # count subscriptions
-                data.c.execute("""SELECT Count(id)
+                data.db.c.execute("""SELECT Count(id)
                 FROM subscriptions""")
-                subscriptions_count = data.c.fetchone()[0]
+                subscriptions_count = data.db.c.fetchone()[0]
 
-                data.set_user_attr(user_id, 'transmissions', transmissions_count)
-                data.set_user_attr(user_id, 'subscribers', subscribers_count)
-                data.set_user_attr(user_id, 'subscriptions', subscriptions_count)
+                data.db.set_user_attr(user_id, 'transmissions', transmissions_count)
+                data.db.set_user_attr(user_id, 'subscribers', subscribers_count)
+                data.db.set_user_attr(user_id, 'subscriptions', subscriptions_count)
 
             elif job_body['job_desc'] == 'fetch_remote_profile':
                 ipv6 = job_body['ipv6']
-                profile = data.get_profile(ipv6)
+                profile = data.db.get_profile(ipv6)
                 db_time = profile['updated_at']
                 t = strptime(db_time, '%Y-%m-%d %H:%M:%S.%f')
                 db_time = datetime(t[0], t[1], t[2], t[3], t[4], t[5])
 
                 if db_time < one_hour_ago():
-                    user_id = data._get_or_create_userid(ipv6)
-                    data.set_user_attr(user_id, 'name', profile['name'])    # just to refresh updated_at
-                    data._fetch_remote_profile(ipv6)
+                    user_id = data.db._get_or_create_userid(ipv6)
+                    data.db.set_user_attr(user_id, 'name', profile['name'])    # just to refresh updated_at
+                    data.db._fetch_remote_profile(ipv6)
 
         except Exception as strerr:
             log.error('error processing job: %s', strerr)
@@ -252,7 +253,7 @@ def notification_worker():
 
 
                 if result == 'unsubscribed':
-                    data.remove_subscriber(receiver)
+                    data.db.remove_subscriber(receiver)
 
             elif job_body['job_desc'] == 'notify_all_subscribers':
                 try:
@@ -264,7 +265,7 @@ def notification_worker():
                     retransmission_original_time = job_body['telegram']['retransmission_original_time']
 
                     # push notification
-                    subscribers = data.get_all_subscribers()
+                    subscribers = data.db.get_all_subscribers()
 
                     i = -10 #process first 10 without sleep
                     for sub in subscribers:
@@ -295,7 +296,7 @@ def notification_worker():
                     created_at = job_body['telegram']['created_at']
 
                     # push notification
-                    subscribers = data.get_all_subscribers()
+                    subscribers = data.db.get_all_subscribers()
 
                     i = -10 #process first 10 without sleep
                     for sub in subscribers:

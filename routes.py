@@ -9,8 +9,8 @@ from json import loads as json_loads, dumps as json_dumps
 
 from api import *
 from utils import *
-from data import *
 from workers import *
+import data
 
 ################################################################################
 # routes
@@ -19,19 +19,19 @@ from workers import *
 @route('/')
 @internal
 def root():
-    username = data.get_meta('username', '')
+    username = data.db.get_meta('username', '')
     if username == '':
         redirect('/settings')
 
     check_new_transmissions()
-    telegrams = data.get_telegrams()
+    telegrams = data.db.get_telegrams()
 
     return template('home',
         telegrams = telegrams,
         xhr_url = '/xhr/timeline',
         rss_url = '/rss',
-        my_ipv6 = data.get_meta('ipv6'),
-        pending_requests = data.pending_requests_exist(),
+        my_ipv6 = data.db.get_meta('ipv6'),
+        pending_requests = data.db.pending_requests_exist(),
     )
 
 
@@ -39,12 +39,12 @@ def root():
 @route('/rss')
 @internal
 def rss():
-    username = data.get_meta('username', '')
+    username = data.db.get_meta('username', '')
     if username == '':
         redirect('/settings')
 
     check_new_transmissions()
-    telegrams = data.get_telegrams()
+    telegrams = data.db.get_telegrams()
 
     return template('rss',
         telegrams = telegrams,
@@ -63,7 +63,7 @@ def new_telegram():
 
     if text != '':
         text = text.decode('utf-8')
-        ipv6 = data.get_meta('ipv6')
+        ipv6 = data.db.get_meta('ipv6')
         now = str(datetime.utcnow())
 
         json = {
@@ -105,14 +105,14 @@ def new_telegram():
 @route('/<ipv6:re:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}>')
 @internal
 def profile_page(ipv6):
-    username = data.get_meta('username', '')
+    username = data.db.get_meta('username', '')
     if username == '':
         redirect('/settings')
 
-    my_ipv6 = data.get_meta('ipv6')
-    profile = data.get_profile(ipv6)
-    telegrams = data.get_telegrams(author = ipv6, fetch_external = True)
-    subscribed = data.is_in_subscriptions(ipv6)
+    my_ipv6 = data.db.get_meta('ipv6')
+    profile = data.db.get_profile(ipv6)
+    telegrams = data.db.get_telegrams(author = ipv6, fetch_external = True)
+    subscribed = data.db.is_in_subscriptions(ipv6)
 
     return template('me',
         template = 'timeline',
@@ -126,7 +126,7 @@ def profile_page(ipv6):
         subscribers = profile['subscribers'],
         subscriptions = profile['subscriptions'],
         my_ipv6 = my_ipv6,
-        pending_requests = data.pending_requests_exist(),
+        pending_requests = data.db.pending_requests_exist(),
         subscribed = subscribed,
     )
 
@@ -135,13 +135,13 @@ def profile_page(ipv6):
 @route('/<ipv6:re:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}:.{4}>/rss')
 @internal
 def profile_page_rss(ipv6):
-    username = data.get_meta('username', '')
+    username = data.db.get_meta('username', '')
     if username == '':
         redirect('/settings')
 
-    my_ipv6 = data.get_meta('ipv6')
-    profile = data.get_profile(ipv6)
-    telegrams = data.get_telegrams(author = ipv6, fetch_external = True)
+    my_ipv6 = data.db.get_meta('ipv6')
+    profile = data.db.get_profile(ipv6)
+    telegrams = data.db.get_telegrams(author = ipv6, fetch_external = True)
 
     return template('rss',
         telegrams = telegrams,
@@ -155,10 +155,10 @@ def profile_page_rss(ipv6):
 @internal
 def me(ipv6, subscription_type):
 
-    my_ipv6 = data.get_meta('ipv6')
-    profile = data.get_profile(ipv6)
-    user_list = data.get_userlist(subscription_type, ipv6 = ipv6)
-    subscribed = data.is_in_subscriptions(ipv6)
+    my_ipv6 = data.db.get_meta('ipv6')
+    profile = data.db.get_profile(ipv6)
+    user_list = data.db.get_userlist(subscription_type, ipv6 = ipv6)
+    subscribed = data.db.is_in_subscriptions(ipv6)
 
     return template('me',
         template = 'user_list',
@@ -171,7 +171,7 @@ def me(ipv6, subscription_type):
         subscribers = profile['subscribers'],
         subscriptions = profile['subscriptions'],
         my_ipv6 = my_ipv6,
-        pending_requests = data.pending_requests_exist(),
+        pending_requests = data.db.pending_requests_exist(),
         subscribed = subscribed,
     )
 
@@ -181,8 +181,8 @@ def me(ipv6, subscription_type):
 @internal
 def single_telegram(ipv6, created_at):
 
-    my_ipv6 = data.get_meta('ipv6')
-    telegram = data.get_single_telegram(ipv6, created_at)
+    my_ipv6 = data.db.get_meta('ipv6')
+    telegram = data.db.get_single_telegram(ipv6, created_at)
 
     if telegram == None:
         abort(404, 'Telegram does not exist')
@@ -190,7 +190,7 @@ def single_telegram(ipv6, created_at):
     return template('telegram',
         telegram = telegram,
         my_ipv6 = my_ipv6,
-        pending_requests = data.pending_requests_exist(),
+        pending_requests = data.db.pending_requests_exist(),
     )
 
 
@@ -198,7 +198,7 @@ def single_telegram(ipv6, created_at):
 @route('/addressbook')
 @internal
 def addressbook():
-    username = data.get_meta('username', '')
+    username = data.db.get_meta('username', '')
     if username == '':
         redirect('/settings')
 
@@ -212,13 +212,13 @@ def addressbook():
     for i, user in enumerate(user_list):
         ipv6 = pad_ipv6(user_list[i]['ipv6'])
         user_list[i]['ipv6'] = ipv6
-        user_list[i]['subscribed'] = data.is_in_subscriptions(ipv6)
+        user_list[i]['subscribed'] = data.db.is_in_subscriptions(ipv6)
         user_list[i]['name'] = user_list[i]['display_name']
 
     return template('addressbook',
         user_list = user_list,
-        my_ipv6 = data.get_meta('ipv6'),
-        pending_requests = data.pending_requests_exist(),
+        my_ipv6 = data.db.get_meta('ipv6'),
+        pending_requests = data.db.pending_requests_exist(),
     )
 
 
@@ -231,7 +231,7 @@ def addressbook_requests():
 
     if request.POST.get('confirm_request'):
         ipv6 = request.POST.get('confirm_request')
-        profile = data.get_profile(ipv6)
+        profile = data.db.get_profile(ipv6)
         username = profile['name'].encode('utf-8')
 
         log.debug('making request to Enigmabox address book...')
@@ -246,7 +246,7 @@ def addressbook_requests():
             data = 'what=confirm',
             timeout = 5,
         )
-        data.addr_remove_request('from', ipv6)
+        data.db.addr_remove_request('from', ipv6)
         log.debug('done.')
 
     if request.POST.get('decline_request'):
@@ -256,16 +256,16 @@ def addressbook_requests():
             data = 'what=decline',
             timeout = 5,
         )
-        data.addr_remove_request('from', ipv6)
+        data.db.addr_remove_request('from', ipv6)
         log.debug('done.')
 
-    requests_list = data.addr_get_requests('from')
+    requests_list = data.db.addr_get_requests('from')
 
     return template('addressbook_requests',
         requests_list = requests_list,
         addrbook_url = addrbook_url,
-        my_ipv6 = data.get_meta('ipv6'),
-        pending_requests = data.pending_requests_exist(),
+        my_ipv6 = data.db.get_meta('ipv6'),
+        pending_requests = data.db.pending_requests_exist(),
     )
 
 
@@ -275,7 +275,7 @@ def addressbook_requests():
 def addressbook_new_request(ipv6):
 
     addrbook_url = ''
-    profile = data.get_profile(ipv6)
+    profile = data.db.get_profile(ipv6)
     username = profile['name'].encode('utf-8')
     comments = request.POST.get('comments', '')[:256]
 
@@ -292,15 +292,15 @@ def addressbook_new_request(ipv6):
             data = 'what=new&comments=' + quote(comments),
             timeout = 5,
         )
-        data.addr_add_request('to', ipv6, comments)
+        data.db.addr_add_request('to', ipv6, comments)
         log.debug('done.')
         message = 'Request sent.'
 
     return template('addressbook_new_request',
         ipv6 = ipv6,
         addrbook_url = addrbook_url,
-        my_ipv6 = data.get_meta('ipv6'),
-        pending_requests = data.pending_requests_exist(),
+        my_ipv6 = data.db.get_meta('ipv6'),
+        pending_requests = data.db.pending_requests_exist(),
     )
 
 
@@ -309,7 +309,7 @@ def addressbook_new_request(ipv6):
 @internal
 def settings():
 
-    ipv6 = data.get_meta('ipv6', False)
+    ipv6 = data.db.get_meta('ipv6', False)
 
     if not ipv6:
         try:
@@ -323,8 +323,8 @@ def settings():
         except Exception:
             ipv6 = '0000:0000:0000:0000:0000:0000:0000:0000' #TODO
 
-    user_id = data._get_or_create_userid(ipv6)
-    data.set_meta('ipv6', ipv6)
+    user_id = data.db._get_or_create_userid(ipv6)
+    data.db.set_meta('ipv6', ipv6)
 
     message = ('', '')
 
@@ -334,7 +334,7 @@ def settings():
         content = response.read()
         user_list = json_loads(content)['value']
         for u in user_list:
-            spawn(data.get_profile, u['ipv6'])
+            spawn(data.db.get_profile, u['ipv6'])
     except Exception:
         log.info('No Enigmabox address book found, ignoring...')
 
@@ -345,10 +345,10 @@ def settings():
         show_subscriptions = request.POST.get('show_subscriptions', '0')
 
         if username != '':
-            data.set_meta('username', username)
-            data.set_meta('bio', bio)
-            data.set_meta('show_subscribers', show_subscribers)
-            data.set_meta('show_subscriptions', show_subscriptions)
+            data.db.set_meta('username', username)
+            data.db.set_meta('bio', bio)
+            data.db.set_meta('show_subscribers', show_subscribers)
+            data.db.set_meta('show_subscriptions', show_subscriptions)
 
             image = request.files.get('image', False)
 
@@ -358,8 +358,8 @@ def settings():
                 img.thumbnail((75, 75), Image.ANTIALIAS)
                 img.save('./public/img/profile/' + ipv6 + '.png')
 
-            data.set_user_attr(user_id, 'name', username)
-            data.set_user_attr(user_id, 'bio', bio)
+            data.db.set_user_attr(user_id, 'name', username)
+            data.db.set_user_attr(user_id, 'bio', bio)
 
             message = ('success', 'Data successfully saved.')
 
@@ -367,13 +367,13 @@ def settings():
             message = ('error', 'Error: Username must no be blank')
 
     return template('settings',
-        username = data.get_meta('username', ''),
-        bio = data.get_meta('bio', ''),
-        show_subscribers = data.get_meta('show_subscribers', '1'),
-        show_subscriptions = data.get_meta('show_subscriptions', '1'),
+        username = data.db.get_meta('username', ''),
+        bio = data.db.get_meta('bio', ''),
+        show_subscribers = data.db.get_meta('show_subscribers', '1'),
+        show_subscriptions = data.db.get_meta('show_subscriptions', '1'),
         message = message,
-        my_ipv6 = data.get_meta('ipv6'),
-        pending_requests = data.pending_requests_exist(),
+        my_ipv6 = data.db.get_meta('ipv6'),
+        pending_requests = data.db.pending_requests_exist(),
     )
 
 
@@ -394,15 +394,15 @@ def xhr_timeline():
     ipv6 = request.GET.get('ipv6', False)
 
     if ipv6:
-        telegrams = data.get_telegrams(author = ipv6, step = step, since = since, fetch_external = True)
+        telegrams = data.db.get_telegrams(author = ipv6, step = step, since = since, fetch_external = True)
     else:
-        telegrams = data.get_telegrams(step = step, since = since)
+        telegrams = data.db.get_telegrams(step = step, since = since)
 
     return template('timeline',
         telegrams = telegrams,
         xhr = True,
-        my_ipv6 = data.get_meta('ipv6'),
-        pending_requests = data.pending_requests_exist(),
+        my_ipv6 = data.db.get_meta('ipv6'),
+        pending_requests = data.db.pending_requests_exist(),
     )
 
 
@@ -412,7 +412,7 @@ def xhr_timeline():
 def xhr_userlist(ipv6, subscription_type):
 
     step = request.GET.get('step', 0)
-    user_list = data.get_userlist(subscription_type, ipv6, step)
+    user_list = data.db.get_userlist(subscription_type, ipv6, step)
 
     return template('user_list',
         user_list = user_list,
@@ -440,7 +440,7 @@ def xhr_subscribe():
             result = 'failed'
 
         if result == 'success':
-            data.add_subscription(ipv6)
+            data.db.add_subscription(ipv6)
 
         return {"result": result}
 
@@ -455,7 +455,7 @@ def xhr_subscribe():
         except Exception:
             pass
 
-        data.remove_subscription(ipv6)
+        data.db.remove_subscription(ipv6)
         return {"result": "success"}
 
 
@@ -463,7 +463,7 @@ def xhr_subscribe():
 @route('/xhr/mentions_userlist')
 @internal
 def get_mentions_userlist():
-    user_list = data.get_all_subscribers()
+    user_list = data.db.get_all_subscribers()
     return {"user_list": user_list}
 
 
@@ -499,7 +499,7 @@ def xhr_retransmit():
 @internal
 def xhr_delete():
     #ipv6 = request.POST.get('ipv6')
-    my_ipv6 = data.get_meta('ipv6')
+    my_ipv6 = data.db.get_meta('ipv6')
     created_at = request.POST.get('created_at')
 
     queue = Queue()

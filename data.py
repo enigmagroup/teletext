@@ -10,6 +10,7 @@ from json import loads as json_loads, dumps as json_dumps
 
 from utils import *
 from queue import *
+import workers
 
 ################################################################################
 # data class
@@ -540,7 +541,7 @@ class Data():
         self.db.commit()
 
     def get_userlist(self, subscription_type, ipv6 = False, step = 0):
-        my_ipv6 = data.get_meta('ipv6')
+        my_ipv6 = db.get_meta('ipv6')
         step = str(step)
         if subscription_type == 'subscribers':
             subscription_type = 'subscribers'
@@ -628,7 +629,7 @@ class Data():
         VALUES (?)""", (ipv6,))
         self.db.commit()
         self.refresh_counters()
-        spawn(data.get_profile, ipv6)
+        spawn(db.get_profile, ipv6)
         return True
 
     def remove_subscriber(self, ipv6):
@@ -642,7 +643,7 @@ class Data():
         VALUES (?)""", (ipv6,))
         self.db.commit()
         self.refresh_counters()
-        spawn(get_transmissions, ipv6)
+        spawn(workers.get_transmissions, ipv6)
 
     def remove_subscription(self, ipv6):
         self.db.execute("""DELETE FROM subscriptions
@@ -720,4 +721,4 @@ class Data():
 
         return len(self.c.fetchall()) > 0
 
-data = Data('/box/teletext.db')
+db = Data('/box/teletext.db')
