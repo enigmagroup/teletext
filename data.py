@@ -308,7 +308,6 @@ class Data():
 
         if len(result) == 0 and fetch_external and author != my_ipv6:
             try:
-                #TODO: mentions
                 log.debug('trying to get profile %s...', author)
                 profile = self.get_profile(author)
                 response = urlopen(url='http://[' + author + ']:3838/api/v1/get_telegrams.json?step=' + str(step), timeout = 5)
@@ -318,9 +317,9 @@ class Data():
                 result = []
                 for t in telegrams:
                     try:
-                        result.append((t['text'], profile['name'], author, t['created_at'], t['retransmission_from'], t['retransmission_original_time']))
+                        result.append((t['text'], t['mentions'], profile['name'], author, t['created_at'], t['retransmission_from'], t['retransmission_original_time']))
                     except Exception:
-                        result.append((t['text'], profile['name'], author, t['created_at']))
+                        result.append((t['text'], t['mentions'], profile['name'], author, t['created_at']))
             except Exception:
                 log.debug('%s currently unreachable.', author)
                 pass
@@ -400,10 +399,9 @@ class Data():
 
                 profile = self.get_profile(ipv6)
                 try:
-                    # TODO: mentions
-                    result = (telegram['text'], profile['name'], ipv6, telegram['created_at'], telegram['retransmission_from'], telegram['retransmission_original_time'])
+                    result = (telegram['text'], telegram['mentions'], profile['name'], ipv6, telegram['created_at'], telegram['retransmission_from'], telegram['retransmission_original_time'])
                 except Exception:
-                    result = (telegram['text'], profile['name'], ipv6, telegram['created_at'])
+                    result = (telegram['text'], telegram['mentions'], profile['name'], ipv6, telegram['created_at'])
             except Exception:
                 pass
 
@@ -515,6 +513,7 @@ class Data():
             self.add_telegram(telegram['text_unescaped'], my_ipv6, now, 0, telegram['ipv6'], telegram['created_at'])
 
             # notify subscribers
+            # TODO: mentions
             json = {
                 'job_desc': 'notify_all_subscribers',
                 'telegram': {

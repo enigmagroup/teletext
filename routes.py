@@ -66,8 +66,6 @@ def new_telegram():
         ipv6 = data.get_meta('ipv6')
         now = str(datetime.utcnow())
 
-        queue = Queue()
-
         json = {
             'job_desc': 'add_telegram',
             'telegram': {
@@ -80,9 +78,12 @@ def new_telegram():
         }
 
         json = json_dumps(json)
+
+        queue = Queue()
         queue.add('write', json, 1)
         log.debug('write-job added to queue: %s', json)
 
+        # TODO mentions
         json = {
             'job_desc': 'notify_all_subscribers',
             'telegram': {
@@ -92,9 +93,9 @@ def new_telegram():
         }
 
         json = json_dumps(json)
+
         queue.add('notification', json)
         log.debug('notification-job added to queue: %s', json)
-
         queue.close()
 
     redirect('/')

@@ -23,11 +23,13 @@ def telegrams_json():
     telegrams = data.get_telegrams(author = ipv6, no_imported = True, step = step, since = since)
 
     for key, val in enumerate(telegrams):
+        # only keep text, created_at, mentions, and retransmission_from+orgtime if set
         telegrams[key]['text'] = telegrams[key]['text_unescaped']
         del(telegrams[key]['text_unescaped'])
         del(telegrams[key]['author'])
         del(telegrams[key]['ipv6'])
         del(telegrams[key]['created_at_formatted'])
+        del(telegrams[key]['created_at_pubdate'])
         del(telegrams[key]['retransmission_from_author'])
         del(telegrams[key]['retransmission_original_time_formatted'])
 
@@ -46,6 +48,7 @@ def single_telegram_json():
     telegram = data.get_single_telegram(my_ipv6, created_at)
 
     if telegram:
+        # only keep text, created_at, mentions, and retransmission_from+orgtime if set
         telegram['text'] = telegram['text_unescaped']
         del(telegram['text_unescaped'])
         del(telegram['author'])
@@ -72,6 +75,11 @@ def api_new_telegram():
         try:
             telegram = json_loads(telegram)
             text = telegram['text']
+            mentions = telegram['mentions']
+            try:
+                mentions = json_loads(mentions)
+            except Exception:
+                mentions = []
             ipv6 = pad_ipv6(get_real_ip())
             created_at = telegram['created_at']
 
@@ -91,6 +99,7 @@ def api_new_telegram():
                     'job_desc': 'add_telegram',
                     'telegram': {
                         'text': text,
+                        'mentions': mentions,
                         'author': ipv6,
                         'created_at': created_at,
                         'retransmission_from': retransmission_from,
@@ -103,6 +112,7 @@ def api_new_telegram():
 
                 queue = Queue()
                 queue.add('write', json)
+                log.debug('write-job added via API to queue: %s', json)
                 queue.close()
 
                 result = 'success'
@@ -114,6 +124,7 @@ def api_new_telegram():
                     'job_desc': 'add_telegram',
                     'telegram': {
                         'text': text,
+                        'mentions': mentions,
                         'author': ipv6,
                         'created_at': created_at,
                         'imported': 1,
@@ -124,6 +135,7 @@ def api_new_telegram():
 
                 queue = Queue()
                 queue.add('write', json)
+                log.debug('write-job added via API to queue: %s', json)
                 queue.close()
 
                 result = 'success'
