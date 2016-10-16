@@ -419,7 +419,7 @@ class Data():
             created_at = result[4]
             created_at_formatted = format_datestring(result[4])
 
-            if len(result) > 4 and result[5] != None:
+            if len(result) > 5 and result[5] != None:
                 retransmission_from = result[5]
 
                 try:
