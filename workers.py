@@ -54,10 +54,10 @@ def get_transmissions(ipv6):
         for telegram in telegrams:
             text = telegram['text']
             created_at = telegram['created_at']
+            mentions = telegram['mentions']
 
             try:
                 # retransmission
-                log.debug('importing retransmission: %s', text.encode('utf-8'))
 
                 retransmission_from = telegram['retransmission_from']
                 retransmission_original_time = telegram['retransmission_original_time']
@@ -69,6 +69,7 @@ def get_transmissions(ipv6):
                     'job_desc': 'add_telegram',
                     'telegram': {
                         'text': text,
+                        'mentions': mentions,
                         'author': ipv6,
                         'created_at': created_at,
                         'retransmission_from': retransmission_from,
@@ -77,24 +78,25 @@ def get_transmissions(ipv6):
                     }
                 }
 
+                log.debug('importing retransmission: %s', text.encode('utf-8'))
                 json = json_dumps(json)
                 queue.add('write', json)
 
             except Exception:
                 # regular telegram
-                log.debug('importing regular telegram: %s', text.encode('utf-8'))
 
-                # import the telegram
                 json = {
                     'job_desc': 'add_telegram',
                     'telegram': {
                         'text': text,
                         'author': ipv6,
+                        'mentions': mentions,
                         'created_at': created_at,
                         'imported': 1,
                     }
                 }
 
+                log.debug('importing regular telegram: %s', text.encode('utf-8'))
                 json = json_dumps(json)
                 queue.add('write', json)
 
@@ -205,12 +207,14 @@ def notification_worker():
 
                     receiver = job_body['telegram']['receiver']
                     text = job_body['telegram']['text']
+                    mentions = job_body['telegram']['mentions']
                     created_at = job_body['telegram']['created_at']
                     retransmission_from = job_body['telegram']['retransmission_from']
                     retransmission_original_time = job_body['telegram']['retransmission_original_time']
 
                     json = {
                         'text': text,
+                        'mentions': mentions,
                         'created_at': created_at,
                         'retransmission_from': retransmission_from,
                         'retransmission_original_time': retransmission_original_time,
@@ -229,10 +233,12 @@ def notification_worker():
 
                     receiver = job_body['telegram']['receiver']
                     text = job_body['telegram']['text']
+                    mentions = job_body['telegram']['mentions']
                     created_at = job_body['telegram']['created_at']
 
                     json = {
                         'text': text,
+                        'mentions': mentions,
                         'created_at': created_at,
                     }
                     json = json_dumps(json)
@@ -253,6 +259,7 @@ def notification_worker():
                     # retransmission
 
                     text = job_body['telegram']['text']
+                    mentions = job_body['telegram']['mentions']
                     created_at = job_body['telegram']['created_at']
                     retransmission_from = job_body['telegram']['retransmission_from']
                     retransmission_original_time = job_body['telegram']['retransmission_original_time']
@@ -270,6 +277,7 @@ def notification_worker():
                             'job_desc': 'push_telegram',
                             'telegram': {
                                 'text': text,
+                                'mentions': mentions,
                                 'created_at': created_at,
                                 'retransmission_from': retransmission_from,
                                 'retransmission_original_time': retransmission_original_time,
@@ -286,6 +294,7 @@ def notification_worker():
                     # regular telegram
 
                     text = job_body['telegram']['text']
+                    mentions = job_body['telegram']['mentions']
                     created_at = job_body['telegram']['created_at']
 
                     # push notification
@@ -301,6 +310,7 @@ def notification_worker():
                             'job_desc': 'push_telegram',
                             'telegram': {
                                 'text': text,
+                                'mentions': mentions,
                                 'created_at': created_at,
                                 'receiver': sub['ipv6'],
                             }

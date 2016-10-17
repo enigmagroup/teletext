@@ -83,11 +83,11 @@ def new_telegram():
         queue.add('write', json, 1)
         log.debug('write-job added to queue: %s', json)
 
-        # TODO mentions
         json = {
             'job_desc': 'notify_all_subscribers',
             'telegram': {
                 'text': text,
+                'mentions': mentions,
                 'created_at': now,
             }
         }

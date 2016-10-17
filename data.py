@@ -505,14 +505,14 @@ class Data():
             telegram = self.get_single_telegram(author, created_at)
             my_ipv6 = self.get_meta('ipv6')
             now = str(arrow.utcnow())
-            self.add_telegram(telegram['text_unescaped'], my_ipv6, now, 0, telegram['ipv6'], telegram['created_at'])
+            self.add_telegram(telegram['text_unescaped'], telegram['mentions'], my_ipv6, now, 0, telegram['ipv6'], telegram['created_at'])
 
             # notify subscribers
-            # TODO: mentions
             json = {
                 'job_desc': 'notify_all_subscribers',
                 'telegram': {
                     'text': telegram['text_unescaped'],
+                    'mentions': telegram['mentions'],
                     'created_at': now,
                     'retransmission_from': telegram['ipv6'],
                     'retransmission_original_time': telegram['created_at'],

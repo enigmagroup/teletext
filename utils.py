@@ -57,6 +57,6 @@ def link_mentions(text, mentions):
     return text
 
 def one_hour_ago():
-    return arrow.utcnow().replace(hours=-1)
+    return arrow.utcnow().replace(minutes=-1) #TODO
 
 TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss.SSSSSS'
