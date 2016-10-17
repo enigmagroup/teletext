@@ -530,8 +530,7 @@ class Data():
         user_id = self._get_or_create_userid(ipv6)
         self.db.execute("""DELETE FROM telegrams
         WHERE user_id = ?
-        AND created_at = ?
-        LIMIT 1""", (user_id,created_at))
+        AND created_at = ?""", (user_id,created_at))
         self.db.commit()
 
     def get_userlist(self, subscription_type, ipv6 = False, step = 0):
