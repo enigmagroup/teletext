@@ -4,7 +4,7 @@ from gevent import spawn, sleep, monkey; monkey.patch_all()
 from bottle import run, debug
 import logging
 logging.basicConfig(
-    format = "%(levelname) -10s %(asctime)s %(module)s:%(lineno)s %(funcName)s %(message)s",
+    format = "%(levelname) -10s %(asctime)s %(module)s.py:%(lineno)s %(funcName)s(): %(message)s",
     level=logging.DEBUG
 )
 

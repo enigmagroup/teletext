@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from time import mktime, timezone
 from re import compile as re_compile
 import logging as log
+import arrow
 
 ################################################################################
 # utils
@@ -61,4 +62,6 @@ def link_mentions(text, mentions):
     return text
 
 def one_hour_ago():
-    return datetime.utcnow() - timedelta(hours = 1 - timezone/60/60)
+    return arrow.utcnow().replace(hours=-1)
+
+TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss.SSSSSS'

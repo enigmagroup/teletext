@@ -3,13 +3,13 @@
 from gevent import spawn, sleep, monkey; monkey.patch_all()
 from urllib import quote
 from urllib2 import urlopen
-from datetime import datetime
 from time import strptime
 from json import loads as json_loads, dumps as json_dumps
 import logging as log
+import arrow
 
 from queue import *
-from utils import one_hour_ago
+from utils import one_hour_ago, TIME_FORMAT
 import data
 
 ################################################################################
@@ -18,19 +18,14 @@ import data
 
 def check_new_transmissions():
     db_time = data.db.get_meta('last_transmission_check')
-    try:
-        t = strptime(db_time, '%Y-%m-%d %H:%M:%S.%f')
-        db_time = datetime(t[0], t[1], t[2], t[3], t[4], t[5])
-    except Exception:
-        pass
 
-    if db_time == None or db_time < one_hour_ago():
-        log.debug('checking for new transmissions')
+    if db_time == None or arrow.get(db_time) < one_hour_ago():
+        log.info('checking for new transmissions')
         subscriptions = data.db.get_userlist('subscriptions')
         for s in subscriptions:
             spawn(get_transmissions, s['ipv6'])
 
-        data.db.set_meta('last_transmission_check', datetime.utcnow())
+        data.db.set_meta('last_transmission_check', arrow.utcnow().format(TIME_FORMAT))
 
 
 
