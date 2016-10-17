@@ -79,10 +79,6 @@ def api_new_telegram():
             telegram = json_loads(telegram)
             text = telegram['text']
             mentions = telegram['mentions']
-            try:
-                mentions = json_loads(mentions)
-            except Exception:
-                mentions = []
             ipv6 = pad_ipv6(get_real_ip())
             created_at = telegram['created_at']
 
