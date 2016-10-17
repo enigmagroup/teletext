@@ -9,7 +9,7 @@ import logging as log
 import arrow
 
 from queue import *
-from utils import one_hour_ago, TIME_FORMAT
+from utils import *
 import data
 
 ################################################################################
@@ -25,7 +25,7 @@ def check_new_transmissions():
         for s in subscriptions:
             spawn(get_transmissions, s['ipv6'])
 
-        data.db.set_meta('last_transmission_check', arrow.utcnow().format(TIME_FORMAT))
+        data.db.set_meta('last_transmission_check', now_timestamp())
 
 
 

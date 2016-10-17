@@ -64,7 +64,7 @@ def new_telegram():
     if text != '':
         text = text.decode('utf-8')
         ipv6 = data.db.get_meta('ipv6')
-        now = str(arrow.utcnow())
+        now = str(now_timestamp())
 
         json = {
             'job_desc': 'add_telegram',

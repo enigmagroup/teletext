@@ -124,7 +124,7 @@ class Data():
         self.db.commit()
 
     def set_user_attr(self, user_id, key, value):
-        now = str(arrow.utcnow())
+        now = str(now_timestamp())
         self.c.execute("""UPDATE users
         SET """ + key + """ = ?, updated_at = ?
         WHERE id = ?""", (value,now,user_id))
@@ -156,7 +156,7 @@ class Data():
             'transmissions': '0',
             'subscribers': '0',
             'subscriptions': '0',
-            'updated_at': arrow.utcnow(),
+            'updated_at': now_timestamp(),
         }
 
     def get_profile(self, ipv6):
@@ -504,7 +504,7 @@ class Data():
             queue = Queue()
             telegram = self.get_single_telegram(author, created_at)
             my_ipv6 = self.get_meta('ipv6')
-            now = str(arrow.utcnow())
+            now = str(now_timestamp())
             self.add_telegram(telegram['text_unescaped'], telegram['mentions'], my_ipv6, now, 0, telegram['ipv6'], telegram['created_at'])
 
             # notify subscribers
