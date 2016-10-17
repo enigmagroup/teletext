@@ -41,7 +41,7 @@ def pad_ipv6(ipv6):
 def format_datestring(date, pubdate_format=False):
     if pubdate_format:
         return arrow.get(date).format('ddd, DD MMM YYYY HH:MM:SS Z')
-    return arrow.get(date).to('Europe/Zurich').format('HH:MM - DD. MMMM YYYY')
+    return arrow.get(date).to('Europe/Zurich').format('HH:mm - DD. MMMM YYYY')
 
 def format_text(text):
     text = html_escape(text)
