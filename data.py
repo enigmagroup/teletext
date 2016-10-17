@@ -409,6 +409,8 @@ class Data():
             try:
                 mentions = json_loads(mentions)
             except Exception:
+                pass
+            if mentions == None:
                 mentions = []
             text = link_mentions(text, mentions)
             author = result[2]
