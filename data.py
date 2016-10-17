@@ -507,7 +507,7 @@ class Data():
             telegram = self.get_single_telegram(author, created_at)
             my_ipv6 = self.get_meta('ipv6')
             now = str(now_timestamp())
-            self.add_telegram(telegram['text_unescaped'], telegram['mentions'], my_ipv6, now, 0, telegram['ipv6'], telegram['created_at'])
+            self.add_telegram(telegram['text_unescaped'], my_ipv6, now, telegram['mentions'], 0, telegram['ipv6'], telegram['created_at'])
 
             # notify subscribers
             json = {
