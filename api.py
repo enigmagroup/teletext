@@ -80,7 +80,7 @@ def api_new_telegram():
             text = telegram['text']
             mentions = telegram['mentions']
             ipv6 = pad_ipv6(get_real_ip())
-            created_at = telegram['created_at']
+            created_at = arrow.get(telegram['created_at']).format(TIME_FORMAT)
 
             if not data.db.is_in_subscriptions(ipv6):
                 return {"result": "unsubscribed"}
