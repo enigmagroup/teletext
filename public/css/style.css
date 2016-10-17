@@ -82,12 +82,12 @@ ul.timeline, ul.user_list {
     cursor: pointer;
 }
 
-.timeline .rss {
+.rss {
     position: relative;
     padding-bottom: 1em;
 }
 
-.timeline .rss img {
+.rss img {
     position: absolute;
     right: 0;
 }
@@ -309,4 +309,3 @@ ul.telegram, ul.user_list {
     margin: 10px 10px 0 0;
     float: right;
 }
-

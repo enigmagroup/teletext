@@ -2,10 +2,10 @@
 %if not defined('xhr'):
 <div class="row">
     <div class="span8 offset1">
+        <div class="rss">
+            <a href="{{rss_url}}"><img title="RSS feed" src="/static/img/feed-icon-14x14.png" alt="rss" /></a>
+        </div>
         <ul class="timeline xhr" data-xhr-url="{{xhr_url}}">
-            <div class="rss">
-                <a href="{{rss_url}}"><img title="RSS feed" src="/static/img/feed-icon-14x14.png" alt="rss" /></a>
-            </div>
 %end
         %for telegram in telegrams:
             <li>
