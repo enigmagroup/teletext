@@ -4,9 +4,8 @@ import sqlite3
 from gevent import spawn, monkey; monkey.patch_all()
 from urllib import quote
 from urllib2 import urlopen
-from datetime import datetime, timedelta
-from time import timezone, strptime
 from json import loads as json_loads, dumps as json_dumps
+import arrow
 
 from utils import *
 from queue import *
@@ -125,7 +124,7 @@ class Data():
         self.db.commit()
 
     def set_user_attr(self, user_id, key, value):
-        now = str(datetime.utcnow())
+        now = str(arrow.utcnow())
         self.c.execute("""UPDATE users
         SET """ + key + """ = ?, updated_at = ?
         WHERE id = ?""", (value,now,user_id))
@@ -157,7 +156,7 @@ class Data():
             'transmissions': '0',
             'subscribers': '0',
             'subscriptions': '0',
-            'updated_at': datetime.utcnow(),
+            'updated_at': arrow.utcnow(),
         }
 
     def get_profile(self, ipv6):
@@ -181,17 +180,12 @@ class Data():
         profile['updated_at'] = result[6]
 
         db_time = profile['updated_at']
-        try:
-            t = strptime(db_time, '%Y-%m-%d %H:%M:%S.%f')
-            db_time = datetime(t[0], t[1], t[2], t[3], t[4], t[5])
-        except Exception:
-            pass
 
         if db_time == None:
             log.debug('no db time found, new profile, waiting for fetch...')
             profile = self._fetch_remote_profile(ipv6)
 
-        elif db_time < one_hour_ago():
+        elif arrow.get(db_time) < one_hour_ago():
             if my_ipv6 == ipv6:
                 self.refresh_counters()
             else:
@@ -510,7 +504,7 @@ class Data():
             queue = Queue()
             telegram = self.get_single_telegram(author, created_at)
             my_ipv6 = self.get_meta('ipv6')
-            now = str(datetime.utcnow())
+            now = str(arrow.utcnow())
             self.add_telegram(telegram['text_unescaped'], my_ipv6, now, 0, telegram['ipv6'], telegram['created_at'])
 
             # notify subscribers

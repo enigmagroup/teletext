@@ -4,8 +4,8 @@ from gevent import spawn, monkey; monkey.patch_all()
 from bottle import route, error, static_file, template, request, abort, redirect, debug
 from urllib import quote
 from urllib2 import urlopen
-from datetime import datetime
 from json import loads as json_loads, dumps as json_dumps
+import arrow
 
 from api import *
 from utils import *
@@ -64,7 +64,7 @@ def new_telegram():
     if text != '':
         text = text.decode('utf-8')
         ipv6 = data.db.get_meta('ipv6')
-        now = str(datetime.utcnow())
+        now = str(arrow.utcnow())
 
         json = {
             'job_desc': 'add_telegram',

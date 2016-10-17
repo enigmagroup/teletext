@@ -176,10 +176,8 @@ def write_worker():
                 ipv6 = job_body['ipv6']
                 profile = data.db.get_profile(ipv6)
                 db_time = profile['updated_at']
-                t = strptime(db_time, '%Y-%m-%d %H:%M:%S.%f')
-                db_time = datetime(t[0], t[1], t[2], t[3], t[4], t[5])
 
-                if db_time < one_hour_ago():
+                if arrow.get(db_time) < one_hour_ago():
                     user_id = data.db._get_or_create_userid(ipv6)
                     data.db.set_user_attr(user_id, 'name', profile['name'])    # just to refresh updated_at
                     data.db._fetch_remote_profile(ipv6)

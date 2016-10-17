@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from bottle import request, html_escape
-from datetime import datetime, timedelta
 from time import mktime, timezone
 from re import compile as re_compile
 import logging as log
@@ -40,13 +39,9 @@ def pad_ipv6(ipv6):
     return ':'.join([ str(block).zfill(4) for block in splitter ])
 
 def format_datestring(date, pubdate_format=False):
-    dt = datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f')
     if pubdate_format:
-        return dt.strftime('%a, %d %b %Y %H:%M:%S %z')
-    epoch = mktime(dt.timetuple())
-    offset = datetime.fromtimestamp(epoch) - datetime.utcfromtimestamp(epoch)
-    dt = dt + offset
-    return dt.strftime('%H:%M - %d. %B %Y')
+        return arrow.get(date).format('ddd, DD MMM YYYY HH:MM:SS Z')
+    return arrow.get(date).to('Europe/Zurich').format('HH:MM - DD. MMMM YYYY')
 
 def format_text(text):
     text = html_escape(text)
