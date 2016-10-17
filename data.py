@@ -303,7 +303,7 @@ class Data():
 
         if len(result) < 10 and fetch_external and author != my_ipv6:
             try:
-                log.debug('trying to get profile %s...', author)
+                log.debug('trying to fetch profile and telegrams of %s...', author)
                 profile = self.get_profile(author)
                 response = urlopen(url='http://[' + author + ']:3838/api/v1/get_telegrams.json?step=' + str(step), timeout = 5)
                 content = response.read()
@@ -328,6 +328,8 @@ class Data():
             try:
                 mentions = json_loads(mentions)
             except Exception:
+                pass
+            if mentions == None:
                 mentions = []
             text = link_mentions(text, mentions)
             author = res[2]
