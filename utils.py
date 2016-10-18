@@ -17,9 +17,9 @@ def internal(fn):
         remote_ip = get_real_ip()
 
         if ':' in remote_ip:
-            #return '404'
+            return '404'
             # TODO: define your ipv6 and check that
-            pass
+            #pass
         return fn(**kwargs)
 
     return check_ip
