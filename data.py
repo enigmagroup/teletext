@@ -507,15 +507,17 @@ class Data():
 
         # TODO: send email if ipv6 in mentions
         my_ipv6 = self.get_meta('ipv6')
-        if mentions != None and my_ipv6 in mentions:
-            msg = MIMEText(text)
+        if mentions != None:
+            for m in mentions:
+                if my_ipv6 in m[1]:
+                    msg = MIMEText(text)
 
-            msg['Subject'] = text.replace("\n", " ")
-            msg['Date'] = str(datetime.now())
+                    msg['Subject'] = text.replace("\n", " ")
+                    msg['Date'] = str(datetime.now())
 
-            s = smtplib.SMTP('127.0.0.1')
-            s.sendmail("mail@box", ["mail@box"], msg.as_string())
-            s.quit()
+                    s = smtplib.SMTP('127.0.0.1')
+                    s.sendmail("mail@box", ["mail@box"], msg.as_string())
+                    s.quit()
 
     def retransmit_telegram(self, author, created_at):
         try:
