@@ -321,6 +321,9 @@ def notification_worker():
                                     'ipv6': ipv6,
                                 })
 
+                    except Exception as strerr:
+                        log.error("Error adding mentions to subscribers: %s", strerr)
+
                     i = -10 #process first 10 without sleep
                     for sub in subscribers:
 
