@@ -5,7 +5,7 @@ from bottle import run, debug
 import logging
 logging.basicConfig(
     format = "%(levelname) -10s %(asctime)s %(module)s.py:%(lineno)s %(funcName)s(): %(message)s",
-    level=logging.DEBUG
+    level=logging.INFO
 )
 
 from routes import *
