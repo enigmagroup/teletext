@@ -105,6 +105,7 @@ def get_transmissions(ipv6):
 
 
 def write_worker():
+    log.info("spawning write_worker()")
     queue = Queue()
     while True:
         job = queue.get_job('write')
@@ -193,6 +194,7 @@ def write_worker():
 
 
 def notification_worker():
+    log.info("spawning notification_worker()")
     queue = Queue()
     while True:
         job = queue.get_job('notification')

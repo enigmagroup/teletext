@@ -6,6 +6,8 @@ from urllib import quote
 from urllib2 import urlopen
 from json import loads as json_loads, dumps as json_dumps
 import arrow
+import smtplib
+from email.mime.text import MIMEText
 
 from utils import *
 from queue import *
@@ -502,6 +504,18 @@ class Data():
         VALUES (?,?,?,?,?,?,?)""", (text,user_id,created_at,mentions,imported,retransmission_from,retransmission_original_time))
         self.db.commit()
         self.refresh_counters()
+
+        # TODO: send email if ipv6 in mentions
+        my_ipv6 = self.get_meta('ipv6')
+        if mentions != None and my_ipv6 in mentions:
+            msg = MIMEText(text)
+
+            msg['Subject'] = text.replace("\n", " ")
+            msg['Date'] = str(datetime.now())
+
+            s = smtplib.SMTP('127.0.0.1')
+            s.sendmail("mail@box", ["mail@box"], msg.as_string())
+            s.quit()
 
     def retransmit_telegram(self, author, created_at):
         try:
