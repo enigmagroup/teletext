@@ -274,7 +274,6 @@ def notification_worker():
                         for m in mentions:
                             for name, ipv6 in m.iteritems():
                                 subscribers.append({
-                                    'name': name,
                                     'ipv6': ipv6,
                                 })
 

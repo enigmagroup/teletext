@@ -601,7 +601,7 @@ class Data():
 
         return user_list
 
-    def get_all_subscribers(self):
+    def get_all_subscriptions(self):
 
         user_list = []
         _ips = []
@@ -648,7 +648,7 @@ class Data():
 
         return user_list
 
-    def get_all_subscriptions(self):
+    def get_all_subscribers(self):
         self.c.execute("""SELECT subscribers.ipv6
         FROM subscribers
         ORDER BY id ASC""")
