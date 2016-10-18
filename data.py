@@ -503,11 +503,9 @@ class Data():
             for m in mentions:
                 for name, ipv6 in m.iteritems():
                     if ipv6 == my_ipv6:
+                        msg = MIMEText(text + '\n\n--\nSent via Teletext: http://text.box/' + author + '/' + created_at + '')
                         msg['Subject'] = text.replace("\n", " ")
                         msg['Date'] = str(arrow.now())
-
-                        text = text + '\n\n<a href="http://text.box/' + author + '/' + created_at + '">View Telegram</a>'
-                        msg = MIMEText(text)
 
                         s = smtplib.SMTP('127.0.0.1')
                         s.sendmail("mail@box", ["mail@box"], msg.as_string())
