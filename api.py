@@ -82,8 +82,9 @@ def api_new_telegram():
             ipv6 = pad_ipv6(get_real_ip())
             created_at = arrow.get(telegram['created_at']).format(TIME_FORMAT)
 
-            if not data.db.is_in_subscriptions(ipv6):
-                return {"result": "unsubscribed"}
+            # allow this. maybe for later: TODO: blocklist
+            # if not data.db.is_in_subscriptions(ipv6):
+            #     return {"result": "unsubscribed"}
 
             try:
                 # retransmission
