@@ -503,7 +503,7 @@ class Data():
             for m in mentions:
                 for name, ipv6 in m.iteritems():
                     if ipv6 == my_ipv6:
-                        msg = MIMEText(text + '\n\n--\nSent via Teletext: http://text.box/' + author + '/' + created_at + '')
+                        msg = MIMEText(text + '\n\n--\nSent via Teletext: http://text.box/' + author + '/' + created_at.replace(" ", "%20") + '', "plain", "utf-8")
                         msg['Subject'] = text.replace("\n", " ")
                         msg['Date'] = str(arrow.now())
 
