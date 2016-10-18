@@ -505,7 +505,7 @@ class Data():
                     if ipv6 == my_ipv6:
                         msg = MIMEText(text + '\n\n--\nSent via Teletext: http://text.box/' + author + '/' + created_at.replace(" ", "%20") + '', "plain", "utf-8")
                         msg['Subject'] = text.replace("\n", " ")
-                        msg['Date'] = str(arrow.now())
+                        msg['Date'] = str(arrow.now().format(TIME_FORMAT))
 
                         s = smtplib.SMTP('127.0.0.1')
                         s.sendmail("mail@box", ["mail@box"], msg.as_string())
