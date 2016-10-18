@@ -271,14 +271,14 @@ def notification_worker():
 
                     # add mentions to subscribers
                     try:
-                        for m in mentions
+                        for m in mentions:
                             for name, ipv6 in m.iteritems():
                                 subscribers.append({
                                     'name': name,
                                     'ipv6': ipv6,
                                 })
 
-                    except Exception as strerr
+                    except Exception as strerr:
                         log.error("Error adding mentions to subscribers: %s", strerr)
 
                     i = -10 #process first 10 without sleep
