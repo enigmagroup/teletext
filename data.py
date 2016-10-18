@@ -496,6 +496,27 @@ class Data():
         text = text.replace("\r\n", "\n")
         text = text[:256]
         user_id = self._get_or_create_userid(author)
+
+        # send email if ipv6 is in mentions
+        try:
+            my_ipv6 = self.get_meta('ipv6')
+            for m in mentions:
+                for name, ipv6 in m.iteritems():
+                    if ipv6 == my_ipv6:
+                        msg['Subject'] = text.replace("\n", " ")
+                        msg['Date'] = str(arrow.now())
+
+                        text = text + '\n\n<a href="http://text.box/' + author + '/' + created_at + '">View Telegram</a>'
+                        msg = MIMEText(text)
+
+                        s = smtplib.SMTP('127.0.0.1')
+                        s.sendmail("mail@box", ["mail@box"], msg.as_string())
+                        s.quit()
+
+        except Exception as strerr:
+            log.error("Error in sending email: %s", strerr)
+
+        # save into db
         if len(mentions) > 0:
             mentions = json_dumps(mentions)
         else:
@@ -504,20 +525,6 @@ class Data():
         VALUES (?,?,?,?,?,?,?)""", (text,user_id,created_at,mentions,imported,retransmission_from,retransmission_original_time))
         self.db.commit()
         self.refresh_counters()
-
-        # TODO: send email if ipv6 in mentions
-        my_ipv6 = self.get_meta('ipv6')
-        if mentions != None:
-            for m in mentions:
-                if my_ipv6 in m[1]:
-                    msg = MIMEText(text)
-
-                    msg['Subject'] = text.replace("\n", " ")
-                    msg['Date'] = str(datetime.now())
-
-                    s = smtplib.SMTP('127.0.0.1')
-                    s.sendmail("mail@box", ["mail@box"], msg.as_string())
-                    s.quit()
 
     def retransmit_telegram(self, author, created_at):
         try:
