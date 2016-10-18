@@ -303,7 +303,7 @@ class Data():
 
         result = self.c.fetchall()
 
-        if len(result) < 10 and fetch_external and author != my_ipv6:
+        if fetch_external and author != my_ipv6:
             try:
                 log.debug('trying to fetch profile and telegrams of %s...', author)
                 profile = self.get_profile(author)
