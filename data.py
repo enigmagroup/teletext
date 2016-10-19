@@ -506,7 +506,7 @@ class Data():
                         msg = MIMEText(text + '\n\n--\nSent via Teletext: http://text.box/' + author + '/' + created_at.replace(" ", "%20") + '', "plain", "utf-8")
                         msg['To'] = "mail@box"
                         msg['Subject'] = text.replace("\n", " ")
-                        msg['Date'] = str(arrow.now().format(TIME_FORMAT))
+                        msg['Date'] = str(format_datestring(arrow.utcnow(), True))
 
                         s = smtplib.SMTP('127.0.0.1')
                         s.sendmail("mail@box", ["mail@box"], msg.as_string())
