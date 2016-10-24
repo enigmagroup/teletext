@@ -611,6 +611,7 @@ class Data():
         FROM subscriptions
         LEFT JOIN users
         ON subscriptions.ipv6 = users.ipv6
+        WHERE users.name != ""
         ORDER BY subscriptions.id DESC""")
 
         result = self.c.fetchall()
@@ -631,6 +632,7 @@ class Data():
         FROM subscribers
         LEFT JOIN users
         ON subscribers.ipv6 = users.ipv6
+        WHERE users.name != ""
         ORDER BY subscribers.id DESC""")
 
         result = self.c.fetchall()
