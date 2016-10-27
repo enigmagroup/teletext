@@ -126,7 +126,7 @@ def write_worker():
                     retransmission_from = job_body['telegram']['retransmission_from']
                     retransmission_original_time = job_body['telegram']['retransmission_original_time']
                     if not data.db.telegram_exists(retransmission_from, retransmission_original_time):
-                        data.db.add_telegram(text, author, created_at, mentions, imported, retransmission_from, retransmission_original_time, mentions)
+                        data.db.add_telegram(text, author, created_at, mentions, imported, retransmission_from, retransmission_original_time)
                 except Exception:
                     # regular telegram
                     if not data.db.telegram_exists(author, created_at):
