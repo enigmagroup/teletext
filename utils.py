@@ -45,9 +45,9 @@ def format_datestring(date, pubdate_format=False):
 
 def format_text(text):
     text = html_escape(text)
-    text = text.replace('\n', '<br />\n')
     r = re_compile(r"(http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+)")
     text = r.sub('<a target="_blank" href="\\1">\\1</a>', text)
+    text = text.replace('\n', '<br />\n')
     return text
 
 def link_mentions(text, mentions):
